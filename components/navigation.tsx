@@ -104,11 +104,11 @@ export default function Navigation() {
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
-            className="fixed inset-0 z-40 pt-24 px-6 bg-background/95 backdrop-blur-xl md:hidden"
+            className="fixed inset-0 z-40 pt-16 px-4 bg-background/95 backdrop-blur-xl md:hidden"
           >
-            <div className="flex flex-col gap-4">
+            <div className="flex flex-col gap-3">
               {/* Logo in Mobile Menu */}
-              <div className="flex justify-center mb-6">
+              <div className="flex justify-center mb-4">
                 <Link href="/" className="flex items-center">
                   <Image
                     src="/images/hogim logo.png"
@@ -128,7 +128,7 @@ export default function Navigation() {
                 >
                   <Link
                     href={item.href}
-                    className={`block text-2xl font-heading font-bold transition-colors py-3 border-b border-white/10 ${
+                    className={`block text-xl font-heading font-bold transition-colors py-2 border-b border-white/10 ${
                       pathname === item.href ? "text-gold" : "text-white hover:text-gold"
                     }`}
                   >
@@ -139,7 +139,7 @@ export default function Navigation() {
               <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.6 }}>
                 <Link
                   href="/giving"
-                  className="block mt-4 py-4 bg-gold text-background font-bold text-center rounded-xl"
+                  className="block mt-2 py-3 bg-gold text-background font-bold text-center rounded-xl"
                 >
                   Partner With Us
                 </Link>

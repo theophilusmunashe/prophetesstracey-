@@ -269,6 +269,18 @@ const NextLiveService = () => {
           <div className="hidden sm:flex items-center gap-2">
             <Clock className="w-4 h-4 text-white/80" />
             <span className="text-white/90 font-medium">{isServiceActive ? 'Live Now' : nextServiceInfo.time || ''}</span>
+            {isServiceActive && (
+              <motion.button
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={() => window.open('https://www.facebook.com/prophetesstracey-pilime', '_blank')}
+                className="ml-4 px-4 py-2 bg-gold text-background font-bold text-sm rounded-full hover:bg-gold-light transition-all duration-300"
+              >
+                Join Service
+              </motion.button>
+            )}
           </div>
         </div>
 
