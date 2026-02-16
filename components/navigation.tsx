@@ -40,8 +40,8 @@ export default function Navigation() {
         initial={{ y: -100, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.8, ease: "easeOut" }}
-        className={`fixed top-4 sm:top-6 left-1/2 -translate-x-1/2 z-50 transition-all duration-500 ${
-          isScrolled ? "top-2 sm:top-4" : "top-4 sm:top-6"
+        className={`fixed top-2 sm:top-4 left-1/2 -translate-x-1/2 z-50 transition-all duration-500 ${
+          isScrolled ? "top-1 sm:top-2" : "top-2 sm:top-4"
         }`}
       >
         {/* Desktop Navigation - Glassmorphism */}
@@ -104,11 +104,11 @@ export default function Navigation() {
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
-            className="fixed inset-0 z-40 pt-16 px-4 bg-background/95 backdrop-blur-xl md:hidden"
+            className="fixed inset-0 z-40 pt-12 px-3 bg-background/95 backdrop-blur-xl md:hidden"
           >
-            <div className="flex flex-col gap-3">
+            <div className="flex flex-col gap-2">
               {/* Logo in Mobile Menu */}
-              <div className="flex justify-center mb-4">
+              <div className="flex justify-center mb-2">
                 <Link href="/" className="flex items-center">
                   <Image
                     src="/images/hogim logo.png"
@@ -128,7 +128,7 @@ export default function Navigation() {
                 >
                   <Link
                     href={item.href}
-                    className={`block text-xl font-heading font-bold transition-colors py-2 border-b border-white/10 ${
+                    className={`block text-lg font-heading font-bold transition-colors py-1 border-b border-white/10 ${
                       pathname === item.href ? "text-gold" : "text-white hover:text-gold"
                     }`}
                   >
@@ -139,7 +139,7 @@ export default function Navigation() {
               <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.6 }}>
                 <Link
                   href="/giving"
-                  className="block mt-2 py-3 bg-gold text-background font-bold text-center rounded-xl"
+                  className="block mt-1 py-2 bg-gold text-background font-bold text-center rounded-xl"
                 >
                   Partner With Us
                 </Link>

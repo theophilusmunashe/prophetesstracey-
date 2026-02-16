@@ -113,9 +113,21 @@ const NextLiveService = () => {
       const serviceDate = new Date();
       serviceDate.setHours(hours, minutes, 0, 0);
       
-      // Set service date to today if time has passed
+      // Calculate the correct day for the service
+      const currentDay = now.getDay();
+      const serviceDay = days.indexOf(nextServiceInfo.day);
+      
+      // Set service date to the correct day
+      let daysToAdd = serviceDay - currentDay;
+      if (daysToAdd < 0) {
+        daysToAdd += 7; // Add 7 days if the service day is in the past
+      }
+      
+      serviceDate.setDate(serviceDate.getDate() + daysToAdd);
+      
+      // If the calculated service time has passed today, move to next week
       if (serviceDate <= now) {
-        serviceDate.setDate(serviceDate.getDate());
+        serviceDate.setDate(serviceDate.getDate() + 7);
       }
 
       const diff = serviceDate.getTime() - now.getTime();

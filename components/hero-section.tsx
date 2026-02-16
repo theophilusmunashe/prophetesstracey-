@@ -56,7 +56,7 @@ export default function HeroSection() {
         </motion.div>
       </AnimatePresence>
 
-      <div className="relative z-10 text-center max-w-4xl mx-auto px-4 sm:px-6 md:px-8 lg:px-10">
+      <div className="relative z-10 text-center max-w-4xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8">
         <AnimatePresence mode="wait">
           <motion.h1
             key={index}
@@ -70,7 +70,7 @@ export default function HeroSection() {
         </AnimatePresence>
       </div>
 
-      <div className="absolute bottom-4 sm:bottom-6 left-1/2 -translate-x-1/2 z-20">
+      <div className="absolute bottom-2 sm:bottom-4 left-1/2 -translate-x-1/2 z-20">
         <NextLiveService />
       </div>
     </section>
