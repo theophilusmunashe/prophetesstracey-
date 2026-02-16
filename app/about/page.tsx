@@ -265,17 +265,7 @@ export default function AboutPage() {
                     powerful voice of prophecy, healing, and deliverance.
                   </p>
 
-                  <p>
-                    <strong className="text-gold">Prophetess Tracey Pilime</strong> is the visionary founder of Hope Of
-                    Glory International Ministries (HOGIM). With a divine mandate to reach the nations, she operates as a
-                    powerful voice of prophecy, healing, and deliverance.
-                  </p>
-                  <p>
-                    <strong className="text-gold">Prophetess Tracey Pilime</strong> is the visionary founder of Hope Of
-                    Glory International Ministries (HOGIM). With a divine mandate to reach the nations, she operates as a
-                    powerful voice of prophecy, healing, and deliverance.
-                  </p>
-                  <p>
+                    <p>
                     Her ministry has transcended geographical boundaries, touching thousands of lives across the
                     globe—from the UK and USA to Canada and South Africa.
                   </p>

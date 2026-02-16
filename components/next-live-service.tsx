@@ -259,7 +259,7 @@ const NextLiveService = () => {
             transition={{ duration: 1.5, repeat: Infinity }}
             className="relative"
           >
-            <Radio className="w-4 h-4 text-gold" />
+            <Radio className="w-4 h-4 text-white" />
             <motion.div
               animate={{ scale: [1, 1.5, 1] }}
               transition={{ duration: 1.5, repeat: Infinity }}
@@ -271,10 +271,10 @@ const NextLiveService = () => {
         {/* Service info */}
         <div className="relative flex flex-col sm:flex-row items-center gap-2 sm:gap-3">
           <div className="flex items-center gap-2">
-            <Calendar className="w-4 h-4 text-gold" />
+            <Calendar className="w-4 h-4 text-white" />
             <TypingText 
               text={`${nextServiceInfo.day} : ${nextServiceInfo.name}`} 
-              className="text-gold font-heading"
+              className="text-white font-heading"
             />
           </div>
           
