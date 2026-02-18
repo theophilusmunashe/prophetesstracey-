@@ -45,9 +45,30 @@ const givingCategories = [
 ]
 
 const paymentMethods = [
-  { icon: CreditCard, label: "Card Payment" },
-  { icon: Smartphone, label: "Mobile Money" },
-  { icon: Building, label: "Bank Transfer" },
+  { 
+    icon: CreditCard, 
+    label: "Card Payment",
+    id: "card",
+    description: "Pay securely with your credit or debit card"
+  },
+  { 
+    icon: Building, 
+    label: "Bank Payment",
+    id: "bank",
+    description: "Direct bank transfer to our account"
+  },
+  { 
+    icon: Smartphone, 
+    label: "Ecocash",
+    id: "ecocash",
+    description: "Pay using Ecocash mobile money"
+  },
+  { 
+    icon: Gift, 
+    label: "PayPal",
+    id: "paypal",
+    description: "Pay with your PayPal account"
+  },
 ]
 
 const containerVariants: Variants = {
@@ -75,6 +96,9 @@ const itemVariants: Variants = {
 
 export default function GivingPage() {
   const [activeCategory, setActiveCategory] = useState("partnership")
+  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState("card")
+  const [showPaymentDetails, setShowPaymentDetails] = useState(false)
+  const [amount, setAmount] = useState("")
   const activeItem = givingCategories.find((cat) => cat.id === activeCategory)
 
   return (
@@ -169,7 +193,7 @@ export default function GivingPage() {
 
                 {/* Amount Presets */}
                 <div className="grid grid-cols-3 gap-2 sm:gap-3 mb-4 sm:mb-6">
-                  {["$10", "$25", "$50", "$100", "$250", "Custom"].map((amount) => (
+                  {["$5","$10", "$20", "$50", "$100", "$250", "Custom"].map((amount) => (
                     <button
                       key={amount}
                       className="py-2.5 px-3 sm:py-3 sm:px-4 rounded-lg sm:rounded-xl bg-white/10 text-white font-semibold hover:bg-gold hover:text-background transition-all duration-300 border border-white/10 hover:border-gold text-sm sm:text-base"
@@ -192,31 +216,150 @@ export default function GivingPage() {
                 {/* Payment Methods */}
                 <div className="mb-4 sm:mb-6">
                   <p className="text-white/60 text-xs sm:text-sm mb-2 sm:mb-3">Payment Method</p>
-                  <div className="flex gap-2 sm:gap-3">
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3">
                     {paymentMethods.map((method) => (
                       <button
-                        key={method.label}
-                        className="flex-1 flex flex-col items-center gap-1.5 sm:gap-2 py-3 sm:py-4 rounded-lg sm:rounded-xl bg-white/5 border border-white/10 hover:border-gold/50 transition-colors"
+                        key={method.id}
+                        onClick={() => setSelectedPaymentMethod(method.id)}
+                        className={`flex flex-col items-center gap-1.5 sm:gap-2 py-3 sm:py-4 rounded-lg sm:rounded-xl border transition-all duration-300 ${
+                          selectedPaymentMethod === method.id
+                            ? "bg-gold/20 border-gold text-gold"
+                            : "bg-white/5 border-white/10 hover:border-gold/50 text-white/60"
+                        }`}
                       >
-                        <method.icon className="w-4 h-4 sm:w-5 sm:h-5 text-gold" />
-                        <span className="text-white/60 text-xs">{method.label}</span>
+                        <method.icon className="w-4 h-4 sm:w-5 sm:h-5" />
+                        <span className="text-xs font-medium">{method.label}</span>
                       </button>
                     ))}
                   </div>
                 </div>
 
-                {/* Submit Button */}
-                <motion.button
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                  className="w-full py-3 sm:py-4 bg-gold text-background font-bold text-base sm:text-lg rounded-lg sm:rounded-xl hover:bg-gold-light transition-colors flex items-center justify-center gap-2"
+                {/* Payment Details Section */}
+                <motion.div
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ 
+                    opacity: showPaymentDetails ? 1 : 0,
+                    height: showPaymentDetails ? "auto" : 0
+                  }}
+                  transition={{ duration: 0.3 }}
+                  className="overflow-hidden mb-4 sm:mb-6"
                 >
-                  Give Now
-                  <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5" />
-                </motion.button>
+                  <div className="p-4 sm:p-6 rounded-xl bg-white/5 border border-white/10">
+                    {selectedPaymentMethod === "card" && (
+                      <div className="space-y-3">
+                        <input
+                          type="text"
+                          placeholder="Cardholder Name"
+                          className="w-full px-4 py-3 rounded-lg bg-white/10 text-white placeholder-white/40 border border-white/20 focus:border-gold focus:outline-none"
+                        />
+                        <input
+                          type="text"
+                          placeholder="Card Number"
+                          className="w-full px-4 py-3 rounded-lg bg-white/10 text-white placeholder-white/40 border border-white/20 focus:border-gold focus:outline-none"
+                        />
+                        <div className="grid grid-cols-2 gap-3">
+                          <input
+                            type="text"
+                            placeholder="MM/YY"
+                            className="w-full px-4 py-3 rounded-lg bg-white/10 text-white placeholder-white/40 border border-white/20 focus:border-gold focus:outline-none"
+                          />
+                          <input
+                            type="text"
+                            placeholder="CVV"
+                            className="w-full px-4 py-3 rounded-lg bg-white/10 text-white placeholder-white/40 border border-white/20 focus:border-gold focus:outline-none"
+                          />
+                        </div>
+                      </div>
+                    )}
+                    
+                    {selectedPaymentMethod === "bank" && (
+                      <div className="space-y-3">
+                        <input
+                          type="text"
+                          placeholder="Account Holder Name"
+                          className="w-full px-4 py-3 rounded-lg bg-white/10 text-white placeholder-white/40 border border-white/20 focus:border-gold focus:outline-none"
+                        />
+                        <input
+                          type="text"
+                          placeholder="Bank Name"
+                          className="w-full px-4 py-3 rounded-lg bg-white/10 text-white placeholder-white/40 border border-white/20 focus:border-gold focus:outline-none"
+                        />
+                        <input
+                          type="text"
+                          placeholder="Account Number"
+                          className="w-full px-4 py-3 rounded-lg bg-white/10 text-white placeholder-white/40 border border-white/20 focus:border-gold focus:outline-none"
+                        />
+                        <input
+                          type="text"
+                          placeholder="Routing Number"
+                          className="w-full px-4 py-3 rounded-lg bg-white/10 text-white placeholder-white/40 border border-white/20 focus:border-gold focus:outline-none"
+                        />
+                      </div>
+                    )}
+                    
+                    {selectedPaymentMethod === "ecocash" && (
+                      <div className="space-y-3">
+                        <input
+                          type="text"
+                          placeholder="Ecocash Number"
+                          className="w-full px-4 py-3 rounded-lg bg-white/10 text-white placeholder-white/40 border border-white/20 focus:border-gold focus:outline-none"
+                        />
+                        <input
+                          type="text"
+                          placeholder="Account Name"
+                          className="w-full px-4 py-3 rounded-lg bg-white/10 text-white placeholder-white/40 border border-white/20 focus:border-gold focus:outline-none"
+                        />
+                        <input
+                          type="password"
+                          placeholder="PIN"
+                          className="w-full px-4 py-3 rounded-lg bg-white/10 text-white placeholder-white/40 border border-white/20 focus:border-gold focus:outline-none"
+                        />
+                      </div>
+                    )}
+                    
+                    {selectedPaymentMethod === "paypal" && (
+                      <div className="space-y-3">
+                        <input
+                          type="email"
+                          placeholder="PayPal Email"
+                          className="w-full px-4 py-3 rounded-lg bg-white/10 text-white placeholder-white/40 border border-white/20 focus:border-gold focus:outline-none"
+                        />
+                        <input
+                          type="password"
+                          placeholder="PayPal Password"
+                          className="w-full px-4 py-3 rounded-lg bg-white/10 text-white placeholder-white/40 border border-white/20 focus:border-gold focus:outline-none"
+                        />
+                      </div>
+                    )}
+                  </div>
+                </motion.div>
+
+                {/* Action Buttons */}
+                <div className="space-y-3">
+                  <button
+                    onClick={() => setShowPaymentDetails(!showPaymentDetails)}
+                    className="w-full py-3 sm:py-4 bg-gold/20 text-gold font-bold text-base sm:text-lg rounded-lg sm:rounded-xl hover:bg-gold/30 transition-colors flex items-center justify-center gap-2 border border-gold/30"
+                  >
+                    {showPaymentDetails ? "Hide Payment Details" : "Enter Payment Details"}
+                    <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5" />
+                  </button>
+                  
+                  {showPaymentDetails && (
+                    <motion.button
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                      className="w-full py-3 sm:py-4 bg-gold text-background font-bold text-base sm:text-lg rounded-lg sm:rounded-xl hover:bg-gold-light transition-colors flex items-center justify-center gap-2"
+                    >
+                      Process Payment
+                      <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5" />
+                    </motion.button>
+                  )}
+                </div>
 
                 <p className="text-white/40 text-xs text-center mt-3 sm:mt-4 px-2">
-                  Secure payment powered by Stripe. All transactions are encrypted.
+                  Secure payment powered by Stripe & PayPal. All transactions are encrypted and PCI compliant.
                 </p>
               </div>
             </motion.div>

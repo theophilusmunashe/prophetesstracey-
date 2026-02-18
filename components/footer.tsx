@@ -91,18 +91,15 @@ export default function Footer() {
             <ul className="space-y-3 sm:space-y-4">
               <li className="flex items-start gap-2 sm:gap-3">
                 <MapPin className="w-4 h-4 sm:w-5 sm:h-5 text-gold flex-shrink-0 mt-0.5" />
-                <span className="text-white/60 text-xs sm:text-sm">Harare, Zimbabwe</span>
+                <div className="text-white/60 text-xs sm:text-sm">
+                  <div>Cnr First Street & Kwame Nkurumah Ave, Harare, Zimbabwe</div>
+                  <div className="mt-1">Woolworths Building, 2nd Floor, Opposite TV Sales</div>
+                </div>
               </li>
               <li className="flex items-center gap-2 sm:gap-3">
                 <Mail className="w-4 h-4 sm:w-5 sm:h-5 text-gold flex-shrink-0" />
-                <a href="mailto:info@hogim.org" className="text-white/60 text-xs sm:text-sm hover:text-gold transition-colors">
-                  info@hogim.org
-                </a>
-              </li>
-              <li className="flex items-center gap-2 sm:gap-3">
-                <Phone className="w-4 h-4 sm:w-5 sm:h-5 text-gold flex-shrink-0" />
-                <a href="tel:+263000000000" className="text-white/60 text-xs sm:text-sm hover:text-gold transition-colors">
-                  +263 (0) 000 000 000
+                <a href="mailto:info@prophetesstracy.com" className="text-white/60 text-xs sm:text-sm hover:text-gold transition-colors">
+                  info@prophetesstracy.com
                 </a>
               </li>
             </ul>
@@ -146,7 +143,7 @@ export default function Footer() {
         <div className="pt-6 sm:pt-8 border-t border-white/10">
           <div className="flex flex-col sm:flex-row justify-between items-center gap-3 sm:gap-4 text-center sm:text-left">
             <p className="text-white/40 text-xs sm:text-sm">
-              &copy; 2024 Hope Of Glory International Ministries. All rights reserved.
+              &copy; 2026 Hope Of Glory International Ministries. All rights reserved.
             </p>
             <div className="flex gap-4 sm:gap-6">
               <Link href="/privacy" className="text-white/40 hover:text-gold transition-colors text-xs sm:text-sm">

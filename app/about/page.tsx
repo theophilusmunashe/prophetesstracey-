@@ -40,13 +40,13 @@ const slideRight = {
 
 // 2. Image Ticker Component
 const tickerImages = [
-  { src: "/images/prophetess.jpg", alt: "Prophetess ministering" },
+  { src: "/images/prophetess.jpeg", alt: "Prophetess ministering" },
   {
-    src: "/images/prophetess-7.jpg",
+    src: "/images/prophetess7.jpeg",
     alt: "Prophetess praying for congregants",
   },
   { src: "/images/prophetess-8.jpg", alt: "Prophetess preaching passionately" },
-  { src: "/images/prophetess-2.jpg", alt: "Prophetess at a conference" }, // Placeholder
+  { src: "/images/prophetess2.jpeg", alt: "Prophetess at a conference" }, // Placeholder
   { src: "/images/prophetess-3.jpg", alt: "Prophetess in worship" }, // Placeholder
 ]
 
@@ -239,8 +239,29 @@ export default function AboutPage() {
           className="space-y-24 md:space-y-32"
         >
           {/* Section 1: Prophetess Tracey */}
-          <motion.section variants={containerVariants} className="container mx-auto px-4 sm:px-6 lg:px-12">
-            <div className="grid md:grid-cols-5 gap-8 sm:gap-12 items-center">
+          <motion.section variants={containerVariants} className="container mx-auto px-4 sm:px-6 lg:px-12 relative">
+            {/* Abstract Background Design */}
+            <div className="absolute inset-0 overflow-hidden pointer-events-none">
+              <div className="absolute top-10 left-10 w-64 h-64 bg-gold/5 rounded-full blur-3xl" />
+              <div className="absolute top-20 right-20 w-96 h-96 bg-blue-500/5 rounded-full blur-3xl" />
+              <div className="absolute bottom-10 left-1/2 transform -translate-x-1/2 w-80 h-80 bg-purple-500/5 rounded-full blur-3xl" />
+              <div className="absolute top-1/2 left-10 transform -translate-y-1/2 w-48 h-48 bg-gold/3 rounded-full blur-2xl" />
+              <div className="absolute top-1/3 right-10 w-32 h-32 bg-white/5 rounded-full blur-xl" />
+              
+              {/* Abstract Lines */}
+              <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-gold/20 to-transparent" />
+              <div className="absolute bottom-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-gold/20 to-transparent" />
+              <div className="absolute top-0 left-1/4 h-full w-px bg-gradient-to-b from-transparent via-gold/10 to-transparent" />
+              <div className="absolute top-0 right-1/4 h-full w-px bg-gradient-to-b from-transparent via-gold/10 to-transparent" />
+              
+              {/* Decorative Circles */}
+              <div className="absolute top-10 right-1/3 w-2 h-2 bg-gold/30 rounded-full" />
+              <div className="absolute top-20 left-1/3 w-1 h-1 bg-white/20 rounded-full" />
+              <div className="absolute bottom-20 right-1/4 w-1.5 h-1.5 bg-gold/40 rounded-full" />
+              <div className="absolute top-1/2 left-1/2 w-1 h-1 bg-white/30 rounded-full" />
+            </div>
+            
+            <div className="grid md:grid-cols-5 gap-8 sm:gap-12 items-center relative z-20">
               <motion.div variants={slideLeft} className="md:col-span-2">
                 <div className="relative aspect-[4/3] sm:aspect-square md:aspect-[3/4] rounded-xl sm:rounded-2xl overflow-hidden shadow-2xl border-2 sm:border-4 border-gold/20">
                   <Image

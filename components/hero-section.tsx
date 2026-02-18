@@ -12,10 +12,10 @@ const heroTitles = [
 ];
 
 const tickerImages = [
-  { src: "/images/prophetess.jpg", alt: "Prophetess ministering" },
-  { src: "/images/prophetess-7.jpg", alt: "Prophetess praying for congregants" },
+  { src: "/images/prophetess.jpeg", alt: "Prophetess ministering" },
+  { src: "/images/prophetess7.jpeg", alt: "Prophetess praying for congregants" },
   { src: "/images/prophetess-8.jpg", alt: "Prophetess preaching passionately" },
-  { src: "/images/prophetess-2.jpg", alt: "Prophetess at a conference" },
+  { src: "/images/prophetess2.jpeg", alt: "Prophetess at a conference" },
   { src: "/images/prophetess-3.jpg", alt: "Prophetess in worship" },
 ];
 
@@ -39,9 +39,9 @@ function ImageTicker() {
             <Image
               src={img.src}
               alt={img.alt}
-              layout="fill"
-              objectFit="cover"
-              className="transform group-hover:scale-110 transition-transform duration-500"
+              fill
+              className="object-cover transform group-hover:scale-110 transition-transform duration-500"
+              sizes="(max-width: 768px) 100vw, 256px"
             />
           </div>
         ))}
