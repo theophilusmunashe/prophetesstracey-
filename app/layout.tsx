@@ -3,6 +3,9 @@ import type { Metadata, Viewport } from "next"
 import { Montserrat } from "next/font/google"
 import { Analytics } from "@vercel/analytics/next"
 import "./globals.css"
+import AppShell from "@/components/app-shell"
+import { JsonLd } from "@/components/json-ld"
+import { buildDefaultMetadata } from "@/lib/metadata-defaults"
 
 const montserrat = Montserrat({
   subsets: ["latin"],
@@ -17,22 +20,7 @@ const poppins = Montserrat({
   display: "swap",
 })
 
-export const metadata: Metadata = {
-  title: "Hope Of Glory International Ministries | Prophetess Tracey Pilime",
-  description:
-    "A prophetic ministry reaching the nations with the message of hope, healing, and deliverance. Led by Prophetess Tracey Pilime - Voice of Prophecy, Healing & Deliverance.",
-  generator: "v0.app",
-  keywords: [
-    "church",
-    "ministry",
-    "prophetic",
-    "healing",
-    "deliverance",
-    "Zimbabwe",
-    "Prophetess Tracey Pilime",
-    "HOGIM",
-  ],
-}
+export const metadata: Metadata = buildDefaultMetadata()
 
 export const viewport: Viewport = {
   themeColor: "#0d2818",
@@ -46,7 +34,8 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${montserrat.variable} ${poppins.variable} font-sans antialiased`}>
-        {children}
+        <JsonLd />
+        <AppShell>{children}</AppShell>
         <Analytics />
       </body>
     </html>

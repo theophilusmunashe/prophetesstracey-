@@ -1,313 +1,205 @@
 "use client"
 
-import { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import FacebookLiveIcon from './facebook-live-icon';
-import { Radio, Clock, Calendar, Sparkles } from 'lucide-react';
+import { useState, useEffect, useCallback } from 'react'
+import { motion } from 'framer-motion'
 
-const services: { [key: string]: { time: string; name: string }[] } = {
-  '1': [{ time: '13:00', name: 'Word Service' }],
-  '2': [{ time: '13:00', name: 'Prophetic Service' }],
-  '3': [
-    { time: '13:00', name: 'Deliverance Service' },
-    { time: '17:30', name: 'Worship Service' },
+interface ServiceSlot {
+  name: string
+  start: string
+  end: string
+}
+
+const schedule: Record<number, ServiceSlot[]> = {
+  0: [{ name: 'Sunday Service', start: '10:00', end: '13:00' }],
+  1: [
+    { name: 'Word Service', start: '13:00', end: '14:00' },
+    { name: 'School of Spirit', start: '17:30', end: '18:30' },
   ],
-  '4': [
-    { time: '13:00', name: 'Prophetic Service' },
-    { time: '17:30', name: 'Partners' },
-    { time: '20:00', name: 'Diaspora Zoom' },
+  2: [{ name: 'Prophetic Service', start: '13:00', end: '14:00' }],
+  3: [
+    { name: 'Deliverance Service', start: '13:00', end: '14:00' },
+    { name: 'Worship Service', start: '17:30', end: '18:30' },
   ],
-  '5': [{ time: '13:00', name: 'PUSH Prayer' }],
-  '6': [{ time: '14:30', name: 'Push Prayer' }],
-  '0': [{ time: '10:00', name: 'Sunday Service' }],
-};
+  4: [
+    { name: 'Prophetic Service', start: '13:00', end: '14:00' },
+    { name: 'Partners Service', start: '17:30', end: '18:30' },
+    { name: 'Diaspora Zoom', start: '20:00', end: '21:00' },
+  ],
+  5: [{ name: 'PUSH Prayer', start: '13:00', end: '14:00' }],
+  6: [{ name: 'PUSH Prayer', start: '14:30', end: '15:30' }],
+}
 
-const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
 
-const TypingText = ({ text, className = "" }: { text: string; className?: string }) => {
-  const [displayedText, setDisplayedText] = useState("");
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [isComplete, setIsComplete] = useState(false);
+function toMinutes(time: string) {
+  const [h, m] = time.split(':').map(Number)
+  return h * 60 + m
+}
 
-  useEffect(() => {
-    if (currentIndex < text.length) {
-      const timeout = setTimeout(() => {
-        setDisplayedText(text.slice(0, currentIndex + 1));
-        setCurrentIndex(currentIndex + 1);
-      }, 30);
-      return () => clearTimeout(timeout);
-    } else if (!isComplete) {
-      setIsComplete(true);
+function buildServiceDate(now: Date, dayOffset: number, time: string) {
+  const date = new Date(now)
+  date.setDate(date.getDate() + dayOffset)
+  const [h, m] = time.split(':').map(Number)
+  date.setHours(h, m, 0, 0)
+  return date
+}
+
+interface ServiceState {
+  name: string
+  day: string
+  time: string
+  isLive: boolean
+  countdown: string
+}
+
+function resolveService(now: Date): ServiceState | null {
+  const currentDay = now.getDay()
+  const currentMinutes = now.getHours() * 60 + now.getMinutes()
+
+  // 1. Check if a service is happening RIGHT NOW
+  const todaySlots = schedule[currentDay] || []
+  for (const slot of todaySlots) {
+    const startMin = toMinutes(slot.start)
+    const endMin = toMinutes(slot.end)
+    if (currentMinutes >= startMin && currentMinutes < endMin) {
+      const endDate = buildServiceDate(now, 0, slot.end)
+      const diff = endDate.getTime() - now.getTime()
+      const minsLeft = Math.ceil(diff / 60000)
+      return {
+        name: slot.name,
+        day: dayNames[currentDay],
+        time: slot.start,
+        isLive: true,
+        countdown: `Ends in ${minsLeft}m`,
+      }
     }
-  }, [currentIndex, text, isComplete]);
-
-  return (
-    <span className={`${className} ${isComplete ? 'opacity-100' : 'opacity-90'}`}>
-      {displayedText}
-      {!isComplete && (
-        <motion.span
-          animate={{ opacity: [1, 0.3, 1] }}
-          transition={{ duration: 0.8, repeat: Infinity }}
-          className="inline-block w-0.5 h-4 bg-gold/60 ml-0.5 rounded-sm"
-        />
-      )}
-    </span>
-  );
-};
-
-const NextLiveService = () => {
-  const [nextServiceInfo, setNextServiceInfo] = useState<{ name: string; time: string; day: string } | null>(null);
-  const [isHovered, setIsHovered] = useState(false);
-  const [countdown, setCountdown] = useState("");
-
-  useEffect(() => {
-    const getNextService = () => {
-      const now = new Date();
-      const currentDay = now.getDay();
-      const currentTime = now.getHours() * 60 + now.getMinutes();
-
-      // First check if there's an active service today
-      const todayServices = services[currentDay.toString()];
-      if (todayServices) {
-        for (const service of todayServices) {
-          const [hours, minutes] = service.time.split(':').map(Number);
-          const serviceTime = hours * 60 + minutes;
-          const serviceEndTime = serviceTime + 60; // Add 1 hour for service duration
-
-          // Check if service is currently active
-          if (serviceTime <= currentTime && currentTime < serviceEndTime) {
-            return { ...service, day: days[currentDay] };
-          }
-        }
-      }
-
-      // If no active service today, find next service
-      for (let i = 1; i <= 7; i++) {
-        const dayIndex = (currentDay + i) % 7;
-        const dayServices = services[dayIndex.toString()];
-
-        if (dayServices && dayServices.length > 0) {
-          const service = dayServices[0]; // Take first service of the day
-          return { ...service, day: days[dayIndex] };
-        }
-      }
-
-      return null;
-    };
-
-    setNextServiceInfo(getNextService());
-    
-    // Update every minute to check for service changes
-    const interval = setInterval(getNextService, 60000);
-    return () => clearInterval(interval);
-  }, []);
-
-  // Service status effect
-  useEffect(() => {
-    if (!nextServiceInfo) return;
-
-    const updateServiceStatus = () => {
-      const now = new Date();
-      const [hours, minutes] = nextServiceInfo.time.split(':').map(Number);
-      
-      const serviceDate = new Date();
-      serviceDate.setHours(hours, minutes, 0, 0);
-      
-      // Calculate the correct day for the service
-      const currentDay = now.getDay();
-      const serviceDay = days.indexOf(nextServiceInfo.day);
-      
-      // Set service date to the correct day
-      let daysToAdd = serviceDay - currentDay;
-      if (daysToAdd < 0) {
-        daysToAdd += 7; // Add 7 days if the service day is in the past
-      }
-      
-      serviceDate.setDate(serviceDate.getDate() + daysToAdd);
-      
-      // If the calculated service time has passed today, move to next week
-      if (serviceDate <= now) {
-        serviceDate.setDate(serviceDate.getDate() + 7);
-      }
-
-      const diff = serviceDate.getTime() - now.getTime();
-      const hoursLeft = Math.floor(diff / (1000 * 60 * 60));
-      const minutesLeft = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-
-      // Calculate service end time (assuming 1 hour duration)
-      const serviceEndDate = new Date(serviceDate.getTime() + (60 * 60 * 1000));
-      const serviceEndDiff = serviceEndDate.getTime() - now.getTime();
-      const isServiceActive = serviceEndDiff > 0 && diff <= 0;
-
-      if (isServiceActive) {
-        setCountdown("Happening Now...");
-      } else if (hoursLeft > 0) {
-        setCountdown(`Starts in ${hoursLeft}h ${minutesLeft}m`);
-      } else if (minutesLeft > 0) {
-        setCountdown(`Starts in ${minutesLeft}m`);
-      } else {
-        setCountdown("Starting Soon!");
-      }
-    };
-
-    updateServiceStatus();
-    const interval = setInterval(updateServiceStatus, 30000); // Update every 30 seconds
-
-    return () => clearInterval(interval);
-  }, [nextServiceInfo]);
-
-  // State to track if service is active
-  const [isServiceActive, setIsServiceActive] = useState(false);
-
-  // Update service active state
-  useEffect(() => {
-    if (!nextServiceInfo) return;
-
-    const checkServiceStatus = () => {
-      const now = new Date();
-      const [hours, minutes] = nextServiceInfo.time.split(':').map(Number);
-      
-      const serviceDate = new Date();
-      serviceDate.setHours(hours, minutes, 0, 0);
-      
-      // Set service date to today if time has passed
-      if (serviceDate <= now) {
-        serviceDate.setDate(serviceDate.getDate());
-      }
-
-      const diff = serviceDate.getTime() - now.getTime();
-      
-      // Calculate service end time (assuming 1 hour duration)
-      const serviceEndDate = new Date(serviceDate.getTime() + (60 * 60 * 1000));
-      const serviceEndDiff = serviceEndDate.getTime() - now.getTime();
-      const isActive = serviceEndDiff > 0 && diff <= 0;
-
-      setIsServiceActive(isActive);
-    };
-
-    checkServiceStatus();
-    const interval = setInterval(checkServiceStatus, 30000); // Update every 30 seconds
-
-    return () => clearInterval(interval);
-  }, [nextServiceInfo]);
-
-  if (!nextServiceInfo) {
-    return null;
   }
 
+  // 2. Check for remaining services today
+  for (const slot of todaySlots) {
+    if (toMinutes(slot.start) > currentMinutes) {
+      return buildCountdown(now, 0, slot, currentDay)
+    }
+  }
+
+  // 3. Check upcoming days (1–7 ahead)
+  for (let offset = 1; offset <= 7; offset++) {
+    const dayIndex = (currentDay + offset) % 7
+    const daySlots = schedule[dayIndex] || []
+    if (daySlots.length > 0) {
+      return buildCountdown(now, offset, daySlots[0], dayIndex)
+    }
+  }
+
+  return null
+}
+
+function buildCountdown(now: Date, dayOffset: number, slot: ServiceSlot, dayIndex: number): ServiceState {
+  const startDate = buildServiceDate(now, dayOffset, slot.start)
+  const diff = startDate.getTime() - now.getTime()
+
+  const totalMinutes = Math.max(0, Math.floor(diff / 60000))
+  const days = Math.floor(totalMinutes / 1440)
+  const hours = Math.floor((totalMinutes % 1440) / 60)
+  const minutes = totalMinutes % 60
+
+  let countdown: string
+  if (days > 0) {
+    countdown = `${days}d ${hours}h`
+  } else if (hours > 0) {
+    countdown = `${hours}h ${minutes}m`
+  } else if (minutes > 0) {
+    countdown = `${minutes}m`
+  } else {
+    countdown = 'Starting now'
+  }
+
+  return {
+    name: slot.name,
+    day: dayNames[dayIndex],
+    time: slot.start,
+    isLive: false,
+    countdown,
+  }
+}
+
+export default function NextLiveService() {
+  const [service, setService] = useState<ServiceState | null>(null)
+
+  const update = useCallback(() => {
+    setService(resolveService(new Date()))
+  }, [])
+
+  useEffect(() => {
+    update()
+    const id = setInterval(update, 15000)
+    return () => clearInterval(id)
+  }, [update])
+
+  if (!service) return null
+
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
+    <motion.a
+      href="https://www.facebook.com/prophetesstraceypilime"
+      target="_blank"
+      rel="noopener noreferrer"
+      initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.6 }}
-      className="relative"
+      transition={{ duration: 0.5 }}
+      className="group flex items-center gap-3 sm:gap-4 px-4 sm:px-6 py-3 sm:py-4 border border-white/8 hover:border-gold/25 bg-white/3 hover:bg-white/5 transition-all duration-400 max-w-[95vw] sm:max-w-none"
     >
-      {/* Countdown - positioned outside and above container */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.3, duration: 0.5 }}
-        className="absolute -top-3 -right-3 bg-red-500 text-white text-xs px-2 py-1 rounded-full font-bold z-20"
-      >
-        {countdown}
-      </motion.div>
+      {/* Live indicator */}
+      {service.isLive && (
+        <span className="relative flex h-3 w-3 shrink-0">
+          <span className="absolute inset-0 rounded-full bg-red-500 animate-ping opacity-75" />
+          <span className="relative inline-flex rounded-full h-3 w-3 bg-red-500" />
+        </span>
+      )}
 
-      {/* Glow effect */}
-      <motion.div
-        animate={{
-          boxShadow: isHovered 
-            ? "0 0 30px rgba(255, 215, 0, 0.3), 0 0 60px rgba(255, 215, 0, 0.1)"
-            : "0 0 15px rgba(255, 215, 0, 0.2), 0 0 30px rgba(255, 215, 0, 0.05)"
-        }}
-        transition={{ duration: 0.3 }}
-        className="absolute inset-0 rounded-2xl"
-      />
-      
-      <motion.a
-        href="https://www.facebook.com/prophetesstraceypilime"
-        target="_blank"
-        rel="noopener noreferrer"
-        onHoverStart={() => setIsHovered(true)}
-        onHoverEnd={() => setIsHovered(false)}
-        whileHover={{ scale: 1.02, y: -2 }}
-        whileTap={{ scale: 0.98 }}
-        className="relative flex items-center gap-3 bg-white/10 backdrop-blur-xl border border-white/20 font-bold text-sm sm:text-base px-4 sm:px-6 py-2.5 sm:py-3.5 rounded-2xl shadow-2xl transition-all duration-300 hover:border-gold/40 group overflow-hidden min-h-[60px] sm:min-h-[70px]"
-      >
-        {/* Animated gradient background */}
-        <motion.div
-          animate={{
-            background: isHovered
-              ? "linear-gradient(135deg, rgba(255, 215, 0, 0.15), rgba(255, 215, 0, 0.05))"
-              : "linear-gradient(135deg, rgba(255, 215, 0, 0.08), rgba(255, 215, 0, 0.02))"
-          }}
-          transition={{ duration: 0.3 }}
-          className="absolute inset-0"
-        />
-
-        
-        {/* Live indicator */}
-        <motion.div
-          animate={{
-            scale: [1, 1.2, 1],
-            opacity: [0.8, 1, 0.8]
-          }}
-          transition={{ duration: 2, repeat: Infinity }}
-          className="relative flex items-center gap-2"
-        >
-          <motion.div
-            animate={{ opacity: [1, 0.5, 1] }}
-            transition={{ duration: 1.5, repeat: Infinity }}
-            className="relative"
-          >
-            <Radio className="w-4 h-4 text-white" />
-            <motion.div
-              animate={{ scale: [1, 1.5, 1] }}
-              transition={{ duration: 1.5, repeat: Infinity }}
-              className="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full"
-            />
-          </motion.div>
-        </motion.div>
-
-        {/* Service info */}
-        <div className="relative flex flex-col sm:flex-row items-center gap-2 sm:gap-3">
-          <div className="flex items-center gap-2">
-            <Calendar className="w-4 h-4 text-white" />
-            <TypingText 
-              text={`${nextServiceInfo.day} : ${nextServiceInfo.name}`} 
-              className="text-white font-heading"
-            />
-          </div>
-          
-          <div className="hidden sm:flex items-center gap-2">
-            <Clock className="w-4 h-4 text-white/80" />
-            <span className="text-white/90 font-medium">{isServiceActive ? 'Live Now' : nextServiceInfo.time || ''}</span>
-            {isServiceActive && (
-              <motion.button
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ opacity: 1, scale: 1 }}
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={() => window.open('https://www.facebook.com/prophetesstracey-pilime', '_blank')}
-                className="ml-4 px-4 py-2 bg-gold text-background font-bold text-sm rounded-full hover:bg-gold-light transition-all duration-300"
-              >
-                Join Service
-              </motion.button>
-            )}
-          </div>
+      {/* Service info */}
+      <div className="flex flex-col gap-0.5 min-w-0">
+        <div className="flex items-center gap-2">
+          {service.isLive ? (
+            <span className="shrink-0 text-[10px] sm:text-[11px] uppercase tracking-[0.15em] font-bold text-red-400">
+              Happening Now
+            </span>
+          ) : (
+            <span className="shrink-0 text-[10px] sm:text-[11px] uppercase tracking-[0.15em] font-medium text-gold/60">
+              Next Service
+            </span>
+          )}
+          <span className={`text-sm sm:text-base font-heading font-semibold truncate ${service.isLive ? 'text-white' : 'text-white/80 group-hover:text-white'} transition-colors duration-300`}>
+            {service.name}
+          </span>
         </div>
+        <span className="text-[11px] sm:text-xs text-white/35">
+          {service.day} &middot; {service.time}
+        </span>
+      </div>
 
-        
-        {/* Hover shine effect */}
-        <motion.div
-          animate={{
-            x: isHovered ? "100%" : "-100%"
-          }}
-          transition={{ duration: 0.6 }}
-          className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
-        />
-      </motion.a>
-    </motion.div>
-  );
-};
+      {/* Divider */}
+      <div className="w-px h-8 bg-white/10 shrink-0 ml-auto" />
 
-export default NextLiveService;
+      {/* Countdown */}
+      <div className="shrink-0 text-right">
+        <span className={`block text-sm sm:text-base font-heading font-bold ${service.isLive ? 'text-red-400' : 'text-gold'}`}>
+          {service.countdown}
+        </span>
+        <span className="text-[10px] sm:text-[11px] text-white/25 uppercase tracking-wider">
+          {service.isLive ? 'remaining' : 'until start'}
+        </span>
+      </div>
+
+      {/* Arrow */}
+      <svg
+        className="shrink-0 w-4 h-4 text-white/20 group-hover:text-gold/60 transition-colors duration-300 ml-auto"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke="currentColor"
+        strokeWidth={2}
+      >
+        <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+      </svg>
+    </motion.a>
+  )
+}

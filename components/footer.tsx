@@ -17,67 +17,76 @@ const quickLinks = [
   { label: "Services", href: "/services" },
   { label: "Events", href: "/events" },
   { label: "Sermons", href: "/sermons" },
-  { label: "Give", href: "/giving" },
+  { label: "Giving", href: "/giving" },
+]
+
+const phoneNumbers = [
+  "0781333706",
+  "0781333708",
+  "0781333909",
+  "0781333707",
 ]
 
 export default function Footer() {
   return (
-    <footer className="relative pt-20 pb-8 overflow-hidden">
-      {/* Background */}
-      <div className="absolute inset-0 bg-gradient-to-t from-black via-background to-background" />
+    <footer className="relative overflow-hidden bg-background">
+      {/* Gold accent line */}
+      <div className="h-px bg-linear-to-r from-transparent via-gold/40 to-transparent" />
 
-      {/* Top Border Accent */}
-      <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-gold/50 to-transparent" />
+      {/* Main footer content */}
+      <div className="max-w-7xl mx-auto px-5 sm:px-8 lg:px-12 pt-16 sm:pt-20 pb-8 sm:pb-10">
+        {/* Top: Logo + tagline centered */}
+        <motion.div
+          initial={{ opacity: 0, y: 15 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
+          className="flex flex-col items-center text-center mb-14 sm:mb-16"
+        >
+          <Link href="/" className="mb-5">
+            <Image
+              src="/images/hogim logo.png"
+              alt="Hope Of Glory International Ministries"
+              width={160}
+              height={54}
+              className="h-12 sm:h-14 w-auto object-contain"
+            />
+          </Link>
+          <p className="text-white/40 text-sm sm:text-base max-w-md leading-relaxed">
+            A prophetic ministry reaching the nations with the message of hope, healing, and deliverance.
+          </p>
 
-      <div className="relative z-10 container mx-auto px-4 sm:px-6 lg:px-12">
-        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-8 sm:gap-12 mb-12 sm:mb-16">
-          {/* Brand Column */}
-          <div className="lg:col-span-2 sm:col-span-2">
-            <Link href="/" className="flex items-center gap-3 mb-6">
-              <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-gold/20 flex items-center justify-center">
-                <Image
-                  src="/images/hogim logo.png"
-                  alt="Hope Of Glory International Ministries"
-                  width={48}
-                  height={48}
-                  className="object-contain"
-                />
-              </div>
-              <div>
-                <h3 className="font-heading font-bold text-white text-base sm:text-lg">Hope Of Glory</h3>
-                <p className="text-white/60 text-xs sm:text-sm">International Ministries</p>
-              </div>
-            </Link>
-
-            <p className="text-white/60 leading-relaxed mb-4 sm:mb-6 max-w-md text-sm sm:text-base">
-              A prophetic ministry reaching the nations with the message of hope, healing, and deliverance. Led by
-              Prophetess Tracey Pilime, bridging the physical and digital to bring God's glory to all.
-            </p>
-
-            {/* Social Links */}
-            <div className="flex gap-2 sm:gap-3">
-              {socialLinks.map((social) => (
-                <motion.a
-                  key={social.label}
-                  href={social.href}
-                  whileHover={{ scale: 1.1 }}
-                  whileTap={{ scale: 0.95 }}
-                  className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-gold hover:text-background text-white/60 transition-all duration-300"
-                  aria-label={social.label}
-                >
-                  <social.icon className="w-3 h-3 sm:w-4 sm:h-4" />
-                </motion.a>
-              ))}
-            </div>
+          {/* Social row */}
+          <div className="flex items-center gap-4 mt-6">
+            {socialLinks.map((social) => (
+              <motion.a
+                key={social.label}
+                href={social.href}
+                whileHover={{ y: -2 }}
+                whileTap={{ scale: 0.95 }}
+                className="w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center rounded-full border border-white/10 text-white/40 hover:text-gold hover:border-gold/40 transition-all duration-300"
+                aria-label={social.label}
+              >
+                <social.icon className="w-4 h-4" />
+              </motion.a>
+            ))}
           </div>
+        </motion.div>
 
+        {/* Grid: Links + Contact + Location */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10 sm:gap-8 lg:gap-12 mb-14 sm:mb-16">
           {/* Quick Links */}
           <div>
-            <h4 className="font-heading font-bold text-white mb-4 sm:mb-6 text-sm sm:text-base">Quick Links</h4>
-            <ul className="space-y-2 sm:space-y-3">
+            <h4 className="text-[11px] sm:text-xs uppercase tracking-[0.25em] text-white/30 font-medium mb-5">
+              Navigate
+            </h4>
+            <ul className="space-y-3">
               {quickLinks.map((link) => (
                 <li key={link.label}>
-                  <Link href={link.href} className="text-white/60 hover:text-gold transition-colors text-sm sm:text-base">
+                  <Link
+                    href={link.href}
+                    className="text-white/55 hover:text-gold text-sm transition-colors duration-300"
+                  >
                     {link.label}
                   </Link>
                 </li>
@@ -85,71 +94,79 @@ export default function Footer() {
             </ul>
           </div>
 
-          {/* Contact Info */}
+          {/* Location */}
           <div>
-            <h4 className="font-heading font-bold text-white mb-4 sm:mb-6 text-sm sm:text-base">Contact Us</h4>
-            <ul className="space-y-3 sm:space-y-4">
-              <li className="flex items-start gap-2 sm:gap-3">
-                <MapPin className="w-4 h-4 sm:w-5 sm:h-5 text-gold flex-shrink-0 mt-0.5" />
-                <div className="text-white/60 text-xs sm:text-sm">
-                  <div>Cnr First Street & Kwame Nkurumah Ave, Harare, Zimbabwe</div>
-                  <div className="mt-1">Woolworths Building, 2nd Floor, Opposite TV Sales</div>
-                </div>
-              </li>
-              <li className="flex items-center gap-2 sm:gap-3">
-                <Mail className="w-4 h-4 sm:w-5 sm:h-5 text-gold flex-shrink-0" />
-                <a href="mailto:info@prophetesstracy.com" className="text-white/60 text-xs sm:text-sm hover:text-gold transition-colors">
-                  info@prophetesstracy.com
-                </a>
-              </li>
-            </ul>
-            
-            {/* Information Desk */}
-            <div className="mt-6 sm:mt-8 p-4 sm:p-6 rounded-xl bg-white/5 border border-white/10">
-              <h5 className="font-heading font-bold text-gold text-sm sm:text-base mb-3">Information Desk</h5>
-              <div className="space-y-2">
-                <div className="flex items-center gap-2">
-                  <Phone className="w-4 h-4 text-gold" />
-                  <span className="text-white/80 text-sm">0781333706</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Phone className="w-4 h-4 text-gold" />
-                  <span className="text-white/80 text-sm">0781333708</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Phone className="w-4 h-4 text-gold" />
-                  <span className="text-white/80 text-sm">0781333909</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Phone className="w-4 h-4 text-gold" />
-                  <span className="text-white/80 text-sm">0781333707</span>
-                </div>
+            <h4 className="text-[11px] sm:text-xs uppercase tracking-[0.25em] text-white/30 font-medium mb-5">
+              Location
+            </h4>
+            <div className="flex items-start gap-3">
+              <MapPin className="w-4 h-4 text-gold/70 shrink-0 mt-0.5" />
+              <div className="text-white/55 text-sm leading-relaxed">
+                <p>Cnr First Street &amp; Nelson Mandela Ave</p>
+                <p>Woolworths Building, 2nd Floor</p>
+                <p className="text-white/35 mt-1">Opposite TV Sales, Harare, Zimbabwe</p>
               </div>
-              <div className="mt-3 pt-3 border-t border-white/10">
-                <div className="flex items-center gap-2">
-                  <Phone className="w-4 h-4 text-gold" />
-                  <span className="text-gold font-medium text-sm">Finance Hotline</span>
-                </div>
-                <div className="flex items-center gap-2 ml-6">
-                  <Phone className="w-4 h-4 text-white/80" />
-                  <span className="text-white/80 text-sm">0781333707</span>
-                </div>
+            </div>
+          </div>
+
+          {/* Contact */}
+          <div>
+            <h4 className="text-[11px] sm:text-xs uppercase tracking-[0.25em] text-white/30 font-medium mb-5">
+              Information Desk
+            </h4>
+            <ul className="space-y-2.5">
+              {phoneNumbers.map((num) => (
+                <li key={num} className="flex items-center gap-2.5">
+                  <Phone className="w-3.5 h-3.5 text-gold/60" />
+                  <a href={`tel:${num}`} className="text-white/55 text-sm hover:text-gold transition-colors duration-300">
+                    {num}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Email + Finance */}
+          <div>
+            <h4 className="text-[11px] sm:text-xs uppercase tracking-[0.25em] text-white/30 font-medium mb-5">
+              Get In Touch
+            </h4>
+
+            <div className="flex items-center gap-2.5 mb-6">
+              <Mail className="w-3.5 h-3.5 text-gold/60" />
+              <a
+                href="mailto:info@prophetesstracy.com"
+                className="text-white/55 text-sm hover:text-gold transition-colors duration-300"
+              >
+                info@prophetesstracy.com
+              </a>
+            </div>
+
+            <div className="p-4 rounded-lg bg-white/3 border border-white/6">
+              <p className="text-[11px] uppercase tracking-[0.2em] text-gold/70 font-medium mb-2">
+                Finance Hotline
+              </p>
+              <div className="flex items-center gap-2.5">
+                <Phone className="w-3.5 h-3.5 text-gold/60" />
+                <a href="tel:0781333707" className="text-white/55 text-sm hover:text-gold transition-colors duration-300">
+                  0781333707
+                </a>
               </div>
             </div>
           </div>
         </div>
 
-        {/* Bottom Bar */}
-        <div className="pt-6 sm:pt-8 border-t border-white/10">
-          <div className="flex flex-col sm:flex-row justify-between items-center gap-3 sm:gap-4 text-center sm:text-left">
-            <p className="text-white/40 text-xs sm:text-sm">
+        {/* Bottom bar */}
+        <div className="pt-6 border-t border-white/6">
+          <div className="flex flex-col sm:flex-row justify-between items-center gap-3 text-center">
+            <p className="text-white/25 text-xs">
               &copy; 2026 Hope Of Glory International Ministries. All rights reserved.
             </p>
-            <div className="flex gap-4 sm:gap-6">
-              <Link href="/privacy" className="text-white/40 hover:text-gold transition-colors text-xs sm:text-sm">
+            <div className="flex gap-5">
+              <Link href="/privacy" className="text-white/25 hover:text-white/50 transition-colors text-xs">
                 Privacy Policy
               </Link>
-              <Link href="/terms" className="text-white/40 hover:text-gold transition-colors text-xs sm:text-sm">
+              <Link href="/terms" className="text-white/25 hover:text-white/50 transition-colors text-xs">
                 Terms of Service
               </Link>
             </div>

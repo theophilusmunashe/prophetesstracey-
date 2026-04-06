@@ -23,127 +23,157 @@ export default function Navigation() {
 
   useEffect(() => {
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 50)
+      setIsScrolled(window.scrollY > 20)
     }
     window.addEventListener("scroll", handleScroll)
     return () => window.removeEventListener("scroll", handleScroll)
   }, [])
 
-  // Close mobile menu on route change
   useEffect(() => {
     setIsMobileMenuOpen(false)
   }, [pathname])
 
+  useEffect(() => {
+    document.body.style.overflow = isMobileMenuOpen ? "hidden" : ""
+    return () => { document.body.style.overflow = "" }
+  }, [isMobileMenuOpen])
+
   return (
     <>
       <motion.nav
-        initial={{ y: -100, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ duration: 0.8, ease: "easeOut" }}
-        className={`fixed top-2 sm:top-4 left-1/2 -translate-x-1/2 z-50 transition-all duration-500 ${
-          isScrolled ? "top-1 sm:top-2" : "top-2 sm:top-4"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.6, delay: 0.2 }}
+        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
+          isScrolled
+            ? "bg-background/95 backdrop-blur-md border-b border-white/5 shadow-lg shadow-black/10"
+            : "bg-transparent"
         }`}
       >
-        {/* Desktop Navigation - Glassmorphism */}
-        <div className="hidden md:flex items-center gap-1 px-2 py-2 rounded-full bg-white/10 backdrop-blur-xl border border-white/20 shadow-2xl">
-          <Link href="/" className="px-4 py-2 flex items-center">
-            <Image
-              src="/images/hogim logo.png"
-              alt="Hope Of Glory International Ministries"
-              width={120}
-              height={40}
-              className="h-8 w-auto object-contain"
-            />
-          </Link>
-
-          {navItems.map((item, index) => (
-            <motion.div
-              key={item.label}
-              initial={{ opacity: 0, y: -10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.1 + 0.3 }}
-            >
-              <Link
-                href={item.href}
-                className={`px-3 py-2 text-sm font-medium rounded-full transition-all duration-300 ${
-                  pathname === item.href ? "text-gold bg-white/10" : "text-white/80 hover:text-gold hover:bg-white/10"
-                }`}
-              >
-                {item.label}
-              </Link>
-            </motion.div>
-          ))}
-
-          <motion.div
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: 0.8 }}
-          >
-            <Link
-              href="/giving"
-              className="px-4 py-2 bg-gold text-background font-semibold text-sm rounded-full hover:bg-gold-light transition-all duration-300"
-            >
-              Partner With Us
+        <div className="max-w-7xl mx-auto px-5 sm:px-8 lg:px-12">
+          <div className="flex items-center justify-between h-16 sm:h-20">
+            {/* Logo */}
+            <Link href="/" className="shrink-0">
+              <Image
+                src="/images/hogim logo.png"
+                alt="Hope Of Glory International Ministries"
+                width={140}
+                height={48}
+                className="h-9 sm:h-11 w-auto object-contain"
+              />
             </Link>
-          </motion.div>
-        </div>
 
-        {/* Mobile Menu Button */}
-        <button
-          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-          className="md:hidden flex items-center justify-center w-12 h-12 rounded-full bg-white/10 backdrop-blur-xl border border-white/20"
-        >
-          {isMobileMenuOpen ? <X className="w-5 h-5 text-white" /> : <Menu className="w-5 h-5 text-white" />}
-        </button>
+            {/* Desktop Links */}
+            <div className="hidden md:flex items-center gap-1 lg:gap-2">
+              {navItems.map((item) => (
+                <Link
+                  key={item.label}
+                  href={item.href}
+                  className={`relative px-3 lg:px-4 py-2 text-[13px] uppercase tracking-[0.15em] font-medium transition-colors duration-300 ${
+                    pathname === item.href
+                      ? "text-gold"
+                      : "text-white/70 hover:text-white"
+                  }`}
+                >
+                  {item.label}
+                  {pathname === item.href && (
+                    <motion.span
+                      layoutId="nav-indicator"
+                      className="absolute bottom-0 left-3 right-3 lg:left-4 lg:right-4 h-px bg-gold"
+                      transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                    />
+                  )}
+                </Link>
+              ))}
+
+              <Link
+                href="/giving"
+                className="ml-4 lg:ml-6 px-5 py-2 text-[13px] uppercase tracking-[0.15em] font-semibold text-background bg-gold hover:bg-gold-light transition-colors duration-300"
+              >
+                Partner
+              </Link>
+            </div>
+
+            {/* Mobile Hamburger */}
+            <button
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              className="md:hidden relative w-10 h-10 flex items-center justify-center"
+              aria-label="Toggle menu"
+            >
+              <AnimatePresence mode="wait">
+                {isMobileMenuOpen ? (
+                  <motion.div
+                    key="close"
+                    initial={{ opacity: 0, rotate: -90 }}
+                    animate={{ opacity: 1, rotate: 0 }}
+                    exit={{ opacity: 0, rotate: 90 }}
+                    transition={{ duration: 0.2 }}
+                  >
+                    <X className="w-5 h-5 text-white" />
+                  </motion.div>
+                ) : (
+                  <motion.div
+                    key="menu"
+                    initial={{ opacity: 0, rotate: 90 }}
+                    animate={{ opacity: 1, rotate: 0 }}
+                    exit={{ opacity: 0, rotate: -90 }}
+                    transition={{ duration: 0.2 }}
+                  >
+                    <Menu className="w-5 h-5 text-white" />
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </button>
+          </div>
+        </div>
       </motion.nav>
 
-      {/* Mobile Menu */}
+      {/* Mobile Menu Overlay */}
       <AnimatePresence>
         {isMobileMenuOpen && (
           <motion.div
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            className="fixed inset-0 z-40 pt-12 px-3 bg-background/95 backdrop-blur-xl md:hidden"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.3 }}
+            className="fixed inset-0 z-40 bg-background/98 backdrop-blur-sm md:hidden"
           >
-            <div className="flex flex-col gap-2">
-              {/* Logo in Mobile Menu */}
-              <div className="flex justify-center mb-2">
-                <Link href="/" className="flex items-center">
-                  <Image
-                    src="/images/hogim logo.png"
-                    alt="Hope Of Glory International Ministries"
-                    width={180}
-                    height={60}
-                    className="h-12 w-auto object-contain"
-                  />
-                </Link>
-              </div>
-              {navItems.map((item, index) => (
+            <div className="flex flex-col justify-center items-center h-full px-8">
+              <nav className="flex flex-col items-center gap-6">
+                {navItems.map((item, index) => (
+                  <motion.div
+                    key={item.label}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: 10 }}
+                    transition={{ delay: index * 0.07, duration: 0.3 }}
+                  >
+                    <Link
+                      href={item.href}
+                      className={`text-2xl font-heading font-light uppercase tracking-[0.2em] transition-colors duration-300 ${
+                        pathname === item.href ? "text-gold" : "text-white/60 hover:text-white"
+                      }`}
+                    >
+                      {item.label}
+                    </Link>
+                  </motion.div>
+                ))}
+
                 <motion.div
-                  key={item.label}
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: index * 0.1 }}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: 10 }}
+                  transition={{ delay: navItems.length * 0.07, duration: 0.3 }}
+                  className="mt-4"
                 >
                   <Link
-                    href={item.href}
-                    className={`block text-lg font-heading font-bold transition-colors py-1 border-b border-white/10 ${
-                      pathname === item.href ? "text-gold" : "text-white hover:text-gold"
-                    }`}
+                    href="/giving"
+                    className="px-8 py-3 text-sm uppercase tracking-[0.2em] font-semibold text-background bg-gold hover:bg-gold-light transition-colors duration-300"
                   >
-                    {item.label}
+                    Partner With Us
                   </Link>
                 </motion.div>
-              ))}
-              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.6 }}>
-                <Link
-                  href="/giving"
-                  className="block mt-1 py-2 bg-gold text-background font-bold text-center rounded-xl"
-                >
-                  Partner With Us
-                </Link>
-              </motion.div>
+              </nav>
             </div>
           </motion.div>
         )}

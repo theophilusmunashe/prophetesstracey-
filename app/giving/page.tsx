@@ -1,370 +1,397 @@
 "use client"
 
-import { motion, Variants } from "framer-motion"
-import { useState } from "react"
-import { Heart, Sparkles, Flame, Gift, HandHeart, ArrowRight, CreditCard, Smartphone, Building } from "lucide-react"
+import { useState, useEffect, useRef } from "react"
+import { motion, AnimatePresence } from "framer-motion"
+import Image from "next/image"
+import {
+  Heart,
+  Sparkles,
+  Flame,
+  Gift,
+  HandHeart,
+  Building2,
+  Smartphone,
+  Globe,
+  Copy,
+  Check,
+  ChevronDown,
+  Mail,
+  Phone,
+  Shield,
+} from "lucide-react"
 import Navigation from "@/components/navigation"
 import Footer from "@/components/footer"
 
-const givingCategories = [
+const navSections = [
+  { id: "overview", label: "Overview" },
+  { id: "ways", label: "Ways to give" },
+  { id: "bank", label: "Bank transfer" },
+  { id: "ecocash", label: "Ecocash" },
+  { id: "international", label: "International" },
+  { id: "faq", label: "FAQ" },
+] as const
+
+const ways = [
   {
     id: "partnership",
     icon: Heart,
     title: "Partnership",
-    description: "Become a covenant partner and support the ongoing work of the ministry monthly.",
-    accent: "from-rose-500 to-rose-600",
+    text: "Monthly covenant partnership to sustain teaching, outreach, and missions.",
   },
   {
     id: "seed",
     icon: Sparkles,
     title: "Seed",
-    description: "Sow a prophetic seed for a specific breakthrough or harvest in your life.",
-    accent: "from-gold to-amber-600",
+    text: "A one-time or recurring seed tied to faith for a specific need or harvest.",
   },
   {
     id: "altar",
     icon: Flame,
     title: "Altar",
-    description: "Build an altar of sacrifice unto the Lord for divine intervention.",
-    accent: "from-orange-500 to-orange-600",
+    text: "Sacrificial giving in response to God’s leading for breakthrough or dedication.",
   },
   {
     id: "offering",
     icon: Gift,
     title: "Offering",
-    description: "Give a general offering to support the daily operations of the ministry.",
-    accent: "from-emerald-500 to-emerald-600",
+    text: "Tithes and general offerings that support weekly ministry operations.",
   },
   {
     id: "charity",
     icon: HandHeart,
-    title: "Charity",
-    description: "Support our outreach programs helping the less fortunate in communities.",
-    accent: "from-blue-500 to-blue-600",
+    title: "Charity & outreach",
+    text: "Projects that serve the community and extend compassion beyond the walls.",
   },
 ]
 
-const paymentMethods = [
-  { 
-    icon: CreditCard, 
-    label: "Card Payment",
-    id: "card",
-    description: "Pay securely with your credit or debit card"
-  },
-  { 
-    icon: Building, 
-    label: "Bank Payment",
-    id: "bank",
-    description: "Direct bank transfer to our account"
-  },
-  { 
-    icon: Smartphone, 
-    label: "Ecocash",
-    id: "ecocash",
-    description: "Pay using Ecocash mobile money"
-  },
-  { 
-    icon: Gift, 
-    label: "PayPal",
-    id: "paypal",
-    description: "Pay with your PayPal account"
+const bankAccounts = [
+  {
+    bank: "Local bank (Zimbabwe)",
+    currency: "USD / ZWL — confirm at finance desk",
+    accountName: "Hope Of Glory International Ministries",
+    accountNumber: "— Request via email or WhatsApp",
+    branch: "Harare",
+    note: "Use your name + giving type (e.g. “Seed — J. Moyo”) as reference.",
   },
 ]
 
-const containerVariants: Variants = {
-  hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: {
-      staggerChildren: 0.1,
-      delayChildren: 0.2,
-    },
+const ecocashLines = [
+  { label: "Finance hotline", number: "0781333707" },
+  { label: "Information desk", number: "0781333706" },
+]
+
+const faqItems = [
+  {
+    q: "Will I receive a receipt?",
+    a: "Yes. Email info@prophetesstracy.com (or use the information desk numbers) with your name, amount, date, and giving type after you give.",
   },
+  {
+    q: "Can I give from outside Zimbabwe?",
+    a: "Yes. Use the international section for PayPal or request USD/EUR bank wiring instructions from the finance team.",
+  },
+  {
+    q: "Is my giving secure?",
+    a: "We never ask for card numbers or PINs on this website. Use official bank/Ecocash details listed here or trusted links we provide.",
+  },
+  {
+    q: "What is the difference between seed and offering?",
+    a: "Offerings support general ministry; a seed is often a faith response for a particular season or promise, as the Lord leads you.",
+  },
+]
+
+function CopyField({ label, value }: { label: string; value: string }) {
+  const [copied, setCopied] = useState(false)
+  return (
+    <div className="flex items-start justify-between gap-3 py-3 border-b border-white/6 last:border-0">
+      <div className="min-w-0">
+        {label ? <p className="text-[11px] uppercase tracking-wider text-white/35">{label}</p> : null}
+        <p className="text-sm text-white/85 mt-0.5 break-all">{value}</p>
+      </div>
+      <button
+        type="button"
+        onClick={() => {
+          void navigator.clipboard.writeText(value)
+          setCopied(true)
+          setTimeout(() => setCopied(false), 2000)
+        }}
+        className="shrink-0 p-2 border border-white/10 hover:border-gold/30 text-white/40 hover:text-gold transition-colors"
+        aria-label={label ? `Copy ${label}` : "Copy"}
+      >
+        {copied ? <Check className="w-4 h-4 text-gold" /> : <Copy className="w-4 h-4" />}
+      </button>
+    </div>
+  )
 }
 
-const itemVariants: Variants = {
-  hidden: { opacity: 0, y: 30 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: {
-      duration: 0.6,
-      ease: [0.22, 1, 0.36, 1],
-    },
-  },
+function CopyNumber({ value }: { value: string }) {
+  const [copied, setCopied] = useState(false)
+  return (
+    <button
+      type="button"
+      onClick={() => {
+        void navigator.clipboard.writeText(value.replace(/\s/g, ""))
+        setCopied(true)
+        setTimeout(() => setCopied(false), 2000)
+      }}
+      className="shrink-0 p-2 border border-white/10 hover:border-gold/30 text-white/40 hover:text-gold transition-colors"
+      aria-label="Copy number"
+    >
+      {copied ? <Check className="w-4 h-4 text-gold" /> : <Copy className="w-4 h-4" />}
+    </button>
+  )
 }
 
 export default function GivingPage() {
-  const [activeCategory, setActiveCategory] = useState("partnership")
-  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState("card")
-  const [showPaymentDetails, setShowPaymentDetails] = useState(false)
-  const [amount, setAmount] = useState("")
-  const activeItem = givingCategories.find((cat) => cat.id === activeCategory)
+  const [activeSection, setActiveSection] = useState<string>("overview")
+  const [openFaq, setOpenFaq] = useState<number | null>(0)
+  const navClickRef = useRef(false)
+
+  useEffect(() => {
+    const onScroll = () => {
+      if (navClickRef.current) return
+      const marker = window.scrollY + window.innerHeight * 0.35
+      for (let i = navSections.length - 1; i >= 0; i--) {
+        const el = document.getElementById(navSections[i].id)
+        if (el && el.offsetTop <= marker) {
+          setActiveSection(navSections[i].id)
+          break
+        }
+      }
+    }
+    onScroll()
+    window.addEventListener("scroll", onScroll, { passive: true })
+    return () => window.removeEventListener("scroll", onScroll)
+  }, [])
+
+  const scrollTo = (id: string) => {
+    navClickRef.current = true
+    setActiveSection(id)
+    document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" })
+    setTimeout(() => {
+      navClickRef.current = false
+    }, 600)
+  }
 
   return (
-    <div className="relative bg-background min-h-screen">
+    <div className="relative bg-background min-h-screen text-white">
       <Navigation />
 
-      <main className="pt-32 pb-20">
-        {/* Background */}
-        <div className="absolute inset-0 bg-gradient-to-b from-background via-emerald-950/40 to-background" />
-
-        {/* Decorative Elements */}
-        <div className="absolute top-1/4 left-0 w-96 h-96 bg-gold/5 rounded-full blur-3xl" />
-        <div className="absolute bottom-1/4 right-0 w-96 h-96 bg-emerald-500/5 rounded-full blur-3xl" />
-
-        <motion.div
-          variants={containerVariants}
-          initial="hidden"
-          animate="visible"
-          className="relative z-10 container mx-auto px-4 sm:px-6 lg:px-12"
-        >
-          {/* Section Header */}
-          <motion.div variants={itemVariants} className="text-center mb-12 sm:mb-16">
-            <span className="inline-block px-3 py-1.5 sm:px-4 sm:py-2 rounded-full bg-gold/10 border border-gold/20 text-gold text-xs sm:text-sm font-medium mb-4 sm:mb-6">
-              Support The Ministry
-            </span>
-            <h1 className="font-heading text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold text-white mb-4 sm:mb-6">
-              Give & <span className="text-gold">Partner</span>
-            </h1>
-            <p className="text-white/60 text-sm sm:text-base lg:text-lg max-w-2xl mx-auto px-4">
-              "Give, and it shall be given unto you; good measure, pressed down, and shaken together."
-              <span className="block text-gold/80 mt-2 text-xs sm:text-sm">— Luke 6:38</span>
+      {/* Hero */}
+      <section className="relative h-[38vh] min-h-[240px] sm:h-[44vh] flex flex-col justify-end overflow-hidden">
+        <Image
+          src="/services.png"
+          alt=""
+          fill
+          priority
+          className="object-cover object-center"
+          sizes="100vw"
+        />
+        <div className="absolute inset-0 bg-linear-to-t from-background via-background/55 to-black/40" />
+        <div className="relative z-10 max-w-7xl mx-auto w-full px-5 sm:px-8 lg:px-12 pb-10">
+          <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
+            <span className="text-[11px] uppercase tracking-[0.35em] text-gold/75 font-medium">Give</span>
+            <h1 className="mt-2 font-heading text-3xl sm:text-4xl md:text-5xl font-bold">Partner with the vision</h1>
+            <p className="mt-3 max-w-xl text-white/45 text-sm sm:text-base">
+              Honour God with your substance. Every gift fuels worship, Word, and outreach.
             </p>
           </motion.div>
+        </div>
+      </section>
 
-          {/* Main Giving Interface */}
-          <div className="max-w-5xl mx-auto">
-            {/* Category Selector */}
-            <motion.div variants={itemVariants} className="flex gap-2 sm:gap-3 overflow-x-auto pb-4 mb-6 sm:mb-8 scrollbar-hide px-4 sm:px-0">
-              {givingCategories.map((category) => (
-                <button
-                  key={category.id}
-                  onClick={() => setActiveCategory(category.id)}
-                  className={`flex-shrink-0 flex items-center gap-2 sm:gap-3 px-4 py-2.5 sm:px-6 sm:py-4 rounded-xl sm:rounded-2xl border transition-all duration-300 ${
-                    activeCategory === category.id
-                      ? "bg-gold text-background border-gold"
-                      : "bg-white/5 text-white border-white/10 hover:border-white/30"
-                  }`}
-                >
-                  <category.icon className="w-4 h-4 sm:w-5 sm:h-5" />
-                  <span className="font-semibold text-sm sm:text-base">{category.title}</span>
-                </button>
-              ))}
-            </motion.div>
+      <div className="h-px bg-linear-to-r from-transparent via-gold/20 to-transparent" />
 
-            {/* Active Category Display */}
-            <motion.div
-              key={activeCategory}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.4 }}
-              className="grid lg:grid-cols-2 gap-6 sm:gap-8 px-4 sm:px-0"
+      {/* Sticky section nav */}
+      <div className="sticky top-16 sm:top-20 z-30 border-b border-white/6 bg-background/95 backdrop-blur-md">
+        <nav
+          className="max-w-7xl mx-auto px-3 sm:px-8 lg:px-12 flex gap-1 overflow-x-auto py-3 scrollbar-hide"
+          aria-label="Giving sections"
+        >
+          {navSections.map((s) => (
+            <button
+              key={s.id}
+              type="button"
+              onClick={() => scrollTo(s.id)}
+              className={`shrink-0 px-3 sm:px-4 py-2 text-[11px] sm:text-xs uppercase tracking-wider transition-colors ${
+                activeSection === s.id ? "text-gold border-b-2 border-gold -mb-[13px] pb-[11px]" : "text-white/40 hover:text-white/70"
+              }`}
             >
-              {/* Info Card */}
-              <div className="relative p-6 sm:p-8 rounded-2xl sm:rounded-3xl bg-white/5 border border-white/10 overflow-hidden">
-                <div
-                  className={`absolute top-0 right-0 w-32 h-32 sm:w-40 sm:h-40 bg-gradient-to-bl ${activeItem?.accent} opacity-20 blur-2xl`}
-                />
+              {s.label}
+            </button>
+          ))}
+        </nav>
+      </div>
 
-                <div className="relative">
-                  <div
-                    className={`w-12 h-12 sm:w-16 sm:h-16 rounded-xl sm:rounded-2xl bg-gradient-to-br ${activeItem?.accent} flex items-center justify-center mb-4 sm:mb-6`}
-                  >
-                    {activeItem && <activeItem.icon className="w-6 h-6 sm:w-8 sm:h-8 text-white" />}
-                  </div>
-
-                  <h3 className="font-heading text-2xl sm:text-3xl font-bold text-white mb-3 sm:mb-4">{activeItem?.title}</h3>
-
-                  <p className="text-white/70 text-sm sm:text-base lg:text-lg leading-relaxed mb-6 sm:mb-8">{activeItem?.description}</p>
-
-                  <div className="p-3 sm:p-4 rounded-xl bg-gold/10 border border-gold/20">
-                    <p className="text-gold/90 italic text-xs sm:text-sm">
-                      "Honour the LORD with thy substance, and with the firstfruits of all thine increase."
-                    </p>
-                    <p className="text-gold/60 text-xs mt-2">— Proverbs 3:9</p>
-                  </div>
-                </div>
+      <main className="max-w-7xl mx-auto px-5 sm:px-8 lg:px-12 py-12 sm:py-16 pb-24 space-y-20 sm:space-y-28">
+        {/* Overview */}
+        <section id="overview" className="scroll-mt-32">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-60px" }}
+            transition={{ duration: 0.55 }}
+            className="grid lg:grid-cols-2 gap-10 lg:gap-16 items-start"
+          >
+            <div>
+              <h2 className="font-heading text-2xl sm:text-3xl font-bold text-white mb-4">Why we give</h2>
+              <p className="text-white/50 leading-relaxed mb-6">
+                Scripture calls us to support God’s house and His work with glad hearts. Your giving helps us preach the
+                Word, care for people, and reach nations—online and on the ground.
+              </p>
+              <blockquote className="border-l-2 border-gold/40 pl-5 py-1 text-white/60 text-sm italic">
+                “Give, and it shall be given unto you; good measure, pressed down, and shaken together…”
+                <cite className="block not-italic text-gold/70 text-xs mt-2">— Luke 6:38</cite>
+              </blockquote>
+            </div>
+            <div className="border border-white/8 bg-white/2 p-6 sm:p-8 space-y-4">
+              <div className="flex items-center gap-2 text-gold/80">
+                <Shield className="w-4 h-4" />
+                <span className="text-xs uppercase tracking-widest font-medium">Safe giving</span>
               </div>
+              <p className="text-white/45 text-sm leading-relaxed">
+                This page shows <strong className="text-white/70">official channels only</strong>. We do not collect card numbers or PINs here. Use bank
+                transfer, Ecocash, or the finance team for card / PayPal options.
+              </p>
+            </div>
+          </motion.div>
+        </section>
 
-              {/* Giving Form */}
-              <div className="p-6 sm:p-8 rounded-2xl sm:rounded-3xl bg-gradient-to-br from-gold/10 to-gold/5 border border-gold/20">
-                <h4 className="font-heading text-lg sm:text-xl font-bold text-white mb-4 sm:mb-6">Make Your {activeItem?.title}</h4>
-
-                {/* Amount Presets */}
-                <div className="grid grid-cols-3 gap-2 sm:gap-3 mb-4 sm:mb-6">
-                  {["$5","$10", "$20", "$50", "$100", "$250", "Custom"].map((amount) => (
-                    <button
-                      key={amount}
-                      className="py-2.5 px-3 sm:py-3 sm:px-4 rounded-lg sm:rounded-xl bg-white/10 text-white font-semibold hover:bg-gold hover:text-background transition-all duration-300 border border-white/10 hover:border-gold text-sm sm:text-base"
-                    >
-                      {amount}
-                    </button>
-                  ))}
+        {/* Ways to give */}
+        <section id="ways" className="scroll-mt-32">
+          <h2 className="font-heading text-2xl sm:text-3xl font-bold text-white mb-2">Ways to give</h2>
+          <p className="text-white/40 text-sm mb-8 max-w-2xl">Choose what matches what God has put on your heart—each category is honoured and prayed over.</p>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {ways.map((w, i) => (
+              <motion.div
+                key={w.id}
+                initial={{ opacity: 0, y: 18 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-40px" }}
+                transition={{ delay: i * 0.05, duration: 0.45 }}
+                className="border border-white/6 bg-white/2 p-5 hover:border-gold/20 transition-colors duration-300"
+              >
+                <div className="w-10 h-10 border border-gold/25 flex items-center justify-center mb-4">
+                  <w.icon className="w-5 h-5 text-gold/80" />
                 </div>
-
-                {/* Custom Amount Input */}
-                <div className="relative mb-4 sm:mb-6">
-                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-white/40 font-bold text-sm sm:text-base">$</span>
-                  <input
-                    type="number"
-                    placeholder="Enter amount"
-                    className="w-full py-3 sm:py-4 pl-10 pr-4 rounded-lg sm:rounded-xl bg-white/10 text-white placeholder-white/40 border border-white/20 focus:border-gold focus:outline-none transition-colors text-sm sm:text-base"
-                  />
-                </div>
-
-                {/* Payment Methods */}
-                <div className="mb-4 sm:mb-6">
-                  <p className="text-white/60 text-xs sm:text-sm mb-2 sm:mb-3">Payment Method</p>
-                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3">
-                    {paymentMethods.map((method) => (
-                      <button
-                        key={method.id}
-                        onClick={() => setSelectedPaymentMethod(method.id)}
-                        className={`flex flex-col items-center gap-1.5 sm:gap-2 py-3 sm:py-4 rounded-lg sm:rounded-xl border transition-all duration-300 ${
-                          selectedPaymentMethod === method.id
-                            ? "bg-gold/20 border-gold text-gold"
-                            : "bg-white/5 border-white/10 hover:border-gold/50 text-white/60"
-                        }`}
-                      >
-                        <method.icon className="w-4 h-4 sm:w-5 sm:h-5" />
-                        <span className="text-xs font-medium">{method.label}</span>
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Payment Details Section */}
-                <motion.div
-                  initial={{ opacity: 0, height: 0 }}
-                  animate={{ 
-                    opacity: showPaymentDetails ? 1 : 0,
-                    height: showPaymentDetails ? "auto" : 0
-                  }}
-                  transition={{ duration: 0.3 }}
-                  className="overflow-hidden mb-4 sm:mb-6"
-                >
-                  <div className="p-4 sm:p-6 rounded-xl bg-white/5 border border-white/10">
-                    {selectedPaymentMethod === "card" && (
-                      <div className="space-y-3">
-                        <input
-                          type="text"
-                          placeholder="Cardholder Name"
-                          className="w-full px-4 py-3 rounded-lg bg-white/10 text-white placeholder-white/40 border border-white/20 focus:border-gold focus:outline-none"
-                        />
-                        <input
-                          type="text"
-                          placeholder="Card Number"
-                          className="w-full px-4 py-3 rounded-lg bg-white/10 text-white placeholder-white/40 border border-white/20 focus:border-gold focus:outline-none"
-                        />
-                        <div className="grid grid-cols-2 gap-3">
-                          <input
-                            type="text"
-                            placeholder="MM/YY"
-                            className="w-full px-4 py-3 rounded-lg bg-white/10 text-white placeholder-white/40 border border-white/20 focus:border-gold focus:outline-none"
-                          />
-                          <input
-                            type="text"
-                            placeholder="CVV"
-                            className="w-full px-4 py-3 rounded-lg bg-white/10 text-white placeholder-white/40 border border-white/20 focus:border-gold focus:outline-none"
-                          />
-                        </div>
-                      </div>
-                    )}
-                    
-                    {selectedPaymentMethod === "bank" && (
-                      <div className="space-y-3">
-                        <input
-                          type="text"
-                          placeholder="Account Holder Name"
-                          className="w-full px-4 py-3 rounded-lg bg-white/10 text-white placeholder-white/40 border border-white/20 focus:border-gold focus:outline-none"
-                        />
-                        <input
-                          type="text"
-                          placeholder="Bank Name"
-                          className="w-full px-4 py-3 rounded-lg bg-white/10 text-white placeholder-white/40 border border-white/20 focus:border-gold focus:outline-none"
-                        />
-                        <input
-                          type="text"
-                          placeholder="Account Number"
-                          className="w-full px-4 py-3 rounded-lg bg-white/10 text-white placeholder-white/40 border border-white/20 focus:border-gold focus:outline-none"
-                        />
-                        <input
-                          type="text"
-                          placeholder="Routing Number"
-                          className="w-full px-4 py-3 rounded-lg bg-white/10 text-white placeholder-white/40 border border-white/20 focus:border-gold focus:outline-none"
-                        />
-                      </div>
-                    )}
-                    
-                    {selectedPaymentMethod === "ecocash" && (
-                      <div className="space-y-3">
-                        <input
-                          type="text"
-                          placeholder="Ecocash Number"
-                          className="w-full px-4 py-3 rounded-lg bg-white/10 text-white placeholder-white/40 border border-white/20 focus:border-gold focus:outline-none"
-                        />
-                        <input
-                          type="text"
-                          placeholder="Account Name"
-                          className="w-full px-4 py-3 rounded-lg bg-white/10 text-white placeholder-white/40 border border-white/20 focus:border-gold focus:outline-none"
-                        />
-                        <input
-                          type="password"
-                          placeholder="PIN"
-                          className="w-full px-4 py-3 rounded-lg bg-white/10 text-white placeholder-white/40 border border-white/20 focus:border-gold focus:outline-none"
-                        />
-                      </div>
-                    )}
-                    
-                    {selectedPaymentMethod === "paypal" && (
-                      <div className="space-y-3">
-                        <input
-                          type="email"
-                          placeholder="PayPal Email"
-                          className="w-full px-4 py-3 rounded-lg bg-white/10 text-white placeholder-white/40 border border-white/20 focus:border-gold focus:outline-none"
-                        />
-                        <input
-                          type="password"
-                          placeholder="PayPal Password"
-                          className="w-full px-4 py-3 rounded-lg bg-white/10 text-white placeholder-white/40 border border-white/20 focus:border-gold focus:outline-none"
-                        />
-                      </div>
-                    )}
-                  </div>
-                </motion.div>
-
-                {/* Action Buttons */}
-                <div className="space-y-3">
-                  <button
-                    onClick={() => setShowPaymentDetails(!showPaymentDetails)}
-                    className="w-full py-3 sm:py-4 bg-gold/20 text-gold font-bold text-base sm:text-lg rounded-lg sm:rounded-xl hover:bg-gold/30 transition-colors flex items-center justify-center gap-2 border border-gold/30"
-                  >
-                    {showPaymentDetails ? "Hide Payment Details" : "Enter Payment Details"}
-                    <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5" />
-                  </button>
-                  
-                  {showPaymentDetails && (
-                    <motion.button
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
-                      className="w-full py-3 sm:py-4 bg-gold text-background font-bold text-base sm:text-lg rounded-lg sm:rounded-xl hover:bg-gold-light transition-colors flex items-center justify-center gap-2"
-                    >
-                      Process Payment
-                      <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5" />
-                    </motion.button>
-                  )}
-                </div>
-
-                <p className="text-white/40 text-xs text-center mt-3 sm:mt-4 px-2">
-                  Secure payment powered by Stripe & PayPal. All transactions are encrypted and PCI compliant.
-                </p>
-              </div>
-            </motion.div>
+                <h3 className="font-heading font-semibold text-white mb-2">{w.title}</h3>
+                <p className="text-white/45 text-sm leading-relaxed">{w.text}</p>
+              </motion.div>
+            ))}
           </div>
-        </motion.div>
+        </section>
+
+        {/* Bank */}
+        <section id="bank" className="scroll-mt-32">
+          <div className="flex items-center gap-3 mb-6">
+            <Building2 className="w-6 h-6 text-gold/70" />
+            <h2 className="font-heading text-2xl sm:text-3xl font-bold text-white">Bank transfer</h2>
+          </div>
+          <p className="text-white/45 text-sm mb-6 max-w-2xl">
+            Prefer local banking? Use the details below or contact finance for the latest verified account numbers before large transfers.
+          </p>
+          {bankAccounts.map((acc) => (
+            <div key={acc.bank} className="border border-white/8 bg-white/2 p-6 sm:p-8 max-w-2xl">
+              <p className="text-gold/80 text-sm font-medium mb-4">{acc.bank} · {acc.currency}</p>
+              <CopyField label="Account name" value={acc.accountName} />
+              <CopyField label="Account number" value={acc.accountNumber} />
+              <CopyField label="Branch" value={acc.branch} />
+              <p className="text-white/35 text-xs mt-4 pt-4 border-t border-white/6">{acc.note}</p>
+            </div>
+          ))}
+        </section>
+
+        {/* Ecocash */}
+        <section id="ecocash" className="scroll-mt-32">
+          <div className="flex items-center gap-3 mb-6">
+            <Smartphone className="w-6 h-6 text-gold/70" />
+            <h2 className="font-heading text-2xl sm:text-3xl font-bold text-white">Ecocash</h2>
+          </div>
+          <p className="text-white/45 text-sm mb-6">Send to a registered ministry line and use your full name as reference.</p>
+          <div className="grid sm:grid-cols-2 gap-4 max-w-2xl">
+            {ecocashLines.map((line) => (
+              <div key={line.number} className="border border-white/8 bg-white/2 p-5">
+                <span className="text-[11px] uppercase tracking-wider text-white/35">{line.label}</span>
+                <div className="flex items-center justify-between gap-3 mt-3">
+                  <a href={`tel:${line.number}`} className="font-heading text-lg sm:text-xl text-gold hover:text-gold-light transition-colors">
+                    {line.number}
+                  </a>
+                  <CopyNumber value={line.number} />
+                </div>
+              </div>
+            ))}
+          </div>
+          <p className="text-white/30 text-xs mt-4">Confirm the active merchant number with the information desk if unsure.</p>
+        </section>
+
+        {/* International */}
+        <section id="international" className="scroll-mt-32">
+          <div className="flex items-center gap-3 mb-6">
+            <Globe className="w-6 h-6 text-gold/70" />
+            <h2 className="font-heading text-2xl sm:text-3xl font-bold text-white">International & PayPal</h2>
+          </div>
+          <div className="grid lg:grid-cols-2 gap-6 items-stretch">
+            <div className="border border-white/8 bg-white/2 p-6 sm:p-8">
+              <h3 className="font-heading font-semibold text-white mb-3">PayPal</h3>
+              <p className="text-white/45 text-sm mb-6">
+                When a ministry PayPal link is available, it will be added here. Until then, email finance for a secure payment link or wiring details.
+              </p>
+              <a
+                href="mailto:info@prophetesstracy.com?subject=International%20giving"
+                className="inline-flex items-center gap-2 px-6 py-3 bg-gold text-background text-sm font-semibold uppercase tracking-wider hover:bg-gold-light transition-colors"
+              >
+                <Mail className="w-4 h-4" />
+                Request PayPal / wire details
+              </a>
+            </div>
+            <div className="border border-gold/15 bg-gold/5 p-6 sm:p-8">
+              <h3 className="font-heading font-semibold text-gold mb-3">Finance contact</h3>
+              <p className="text-white/50 text-sm mb-4">Same team as our information desk—call or email with “Giving” in the subject.</p>
+              <a href="mailto:info@prophetesstracy.com" className="flex items-center gap-2 text-white/70 hover:text-gold text-sm mb-3 transition-colors">
+                <Mail className="w-4 h-4 shrink-0" />
+                info@prophetesstracy.com
+              </a>
+              <a href="tel:0781333707" className="flex items-center gap-2 text-white/70 hover:text-gold text-sm transition-colors">
+                <Phone className="w-4 h-4 shrink-0" />
+                0781333707 (Finance hotline)
+              </a>
+            </div>
+          </div>
+        </section>
+
+        {/* FAQ */}
+        <section id="faq" className="scroll-mt-32 pb-8">
+          <h2 className="font-heading text-2xl sm:text-3xl font-bold text-white mb-8">Questions</h2>
+          <div className="max-w-3xl space-y-2">
+            {faqItems.map((item, i) => (
+              <div key={i} className="border border-white/6 bg-white/2">
+                <button
+                  type="button"
+                  onClick={() => setOpenFaq(openFaq === i ? null : i)}
+                  className="w-full flex items-center justify-between gap-4 p-4 sm:p-5 text-left hover:bg-white/3 transition-colors"
+                >
+                  <span className="font-heading font-medium text-white text-sm sm:text-base pr-4">{item.q}</span>
+                  <ChevronDown
+                    className={`w-5 h-5 shrink-0 text-gold/60 transition-transform ${openFaq === i ? "rotate-180" : ""}`}
+                  />
+                </button>
+                <AnimatePresence>
+                  {openFaq === i && (
+                    <motion.div
+                      initial={{ height: 0, opacity: 0 }}
+                      animate={{ height: "auto", opacity: 1 }}
+                      exit={{ height: 0, opacity: 0 }}
+                      transition={{ duration: 0.25 }}
+                      className="overflow-hidden"
+                    >
+                      <p className="px-4 sm:px-5 pb-5 text-white/45 text-sm leading-relaxed border-t border-white/6 pt-4">
+                        {item.a}
+                      </p>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+            ))}
+          </div>
+        </section>
       </main>
 
       <Footer />

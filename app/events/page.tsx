@@ -1,172 +1,195 @@
 "use client"
 
 import { motion } from "framer-motion"
-import { Calendar, Clock, MapPin, ExternalLink } from "lucide-react"
+import Image from "next/image"
+import { Calendar, MapPin, Sparkles } from "lucide-react"
 import Navigation from "@/components/navigation"
 import Footer from "@/components/footer"
 
-const events = [
-  {
-    title: "February Fasting",
-    date: "18 - 28 February 2026",
-    time: "6:00 AM - 6:00 PM",
-    location: "Main Sanctuary & Online",
-    type: "Special",
-    featured: true,
-    description: "Join us for a powerful season of prayer and fasting as we seek God's direction and breakthrough for the year ahead.",
-  },
-  {
-    title: "Prophetess' Visit to Pakistan",
-    date: "February 2026",
-    time: "To be announced",
-    location: "Pakistan",
-    type: "Special",
-    featured: true,
-    description: "Prophetess Tracey Pilime will be ministering in Pakistan this February. Join us in prayer for this powerful outreach.",
-  },
-  {
-    title: "All Night Prayer",
-    date: "Date to be announced",
-    time: "8:00 PM - 6:00 AM",
-    location: "Main Sanctuary",
-    type: "Special",
-    featured: false,
-    description: "An overnight prayer meeting for deep spiritual warfare and breakthrough. Come expecting divine encounters.",
-  },
-]
-
-const containerVariants = {
-  hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: {
-      staggerChildren: 0.1,
-      delayChildren: 0.2,
-    },
-  },
-}
-
-const itemVariants = {
-  hidden: { opacity: 0, y: 30 },
-  visible: {
+const fadeUp = {
+  hidden: { opacity: 0, y: 28 },
+  visible: (i: number) => ({
     opacity: 1,
     y: 0,
-    transition: {
-      duration: 0.6,
-      ease: [0.22, 1, 0.36, 1],
-    },
-  },
+    transition: { duration: 0.65, delay: i * 0.08, ease: [0.22, 1, 0.36, 1] as const },
+  }),
 }
+
+const events = [
+  {
+    id: "easter",
+    title: "Easter Conference",
+    tagline: "Resurrection power · Word · Worship",
+    dateLabel: "3 — 5 April 2026",
+    days: [
+      { label: "Thu 3 Apr", detail: "Opening night" },
+      { label: "Fri 4 Apr", detail: "Full day sessions" },
+      { label: "Sat 5 Apr", detail: "Closing celebration" },
+    ],
+    location: "Hope Of Glory International Ministries",
+    description:
+      "A three-day gathering to celebrate the risen Christ with powerful teaching, prophetic ministry, and corporate worship.",
+    featured: true,
+  },
+  {
+    id: "passover",
+    title: "Passover Night",
+    tagline: "A sacred evening of remembrance",
+    dateLabel: "3 April 2026",
+    days: [{ label: "Thu 3 Apr", detail: "Evening service" }],
+    location: "Main Sanctuary & streamed online",
+    description:
+      "Join us as we remember the Lamb and encounter God in a night of covenant, prayer, and expectation.",
+    featured: false,
+  },
+] as const
 
 export default function EventsPage() {
   return (
-    <div className="relative bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 min-h-screen">
-      {/* Abstract Background */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-20 left-10 w-72 h-72 bg-gold/5 rounded-full blur-3xl" />
-        <div className="absolute top-40 right-20 w-96 h-96 bg-blue-500/5 rounded-full blur-3xl" />
-        <div className="absolute bottom-20 left-1/2 transform -translate-x-1/2 w-80 h-80 bg-purple-500/5 rounded-full blur-3xl" />
-        <div className="absolute top-1/2 left-20 transform -translate-y-1/2 w-48 h-48 bg-gold/3 rounded-full blur-2xl" />
-        <div className="absolute top-1/3 right-10 w-32 h-32 bg-white/5 rounded-full blur-xl" />
-      </div>
-
+    <div className="relative bg-background min-h-screen text-white overflow-x-hidden">
       <Navigation />
 
-      <main className="relative z-10 pt-32 pb-20">
-        <motion.div
-          initial="hidden"
-          animate="visible"
-          className="container mx-auto px-6 lg:px-12"
-        >
-          {/* Section Header */}
-          <motion.div 
-            initial={{ opacity: 0, y: 30 }}
+      {/* Hero */}
+      <section className="relative h-[52vh] min-h-[320px] sm:h-[58vh] flex flex-col justify-end overflow-hidden">
+        <Image
+          src="/services.png"
+          alt=""
+          fill
+          priority
+          className="object-cover object-center"
+          sizes="100vw"
+        />
+        <div className="absolute inset-0 bg-linear-to-t from-background via-background/55 to-black/40" />
+        <div className="absolute inset-0 bg-linear-to-b from-black/50 to-transparent" />
+
+        <div className="relative z-10 max-w-7xl mx-auto w-full px-5 sm:px-8 lg:px-12 pb-12 sm:pb-16">
+          <motion.div
+            initial={{ opacity: 0, y: 24 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            className="text-center mb-20"
+            transition={{ duration: 0.75, ease: [0.22, 1, 0.36, 1] }}
           >
-            <h1 className="font-heading text-5xl md:text-6xl lg:text-7xl font-bold text-white mb-6 tracking-tight">
-              Upcoming <span className="bg-gradient-to-r from-gold to-gold-light bg-clip-text text-transparent">Events</span>
+            <span className="inline-flex items-center gap-2 text-[11px] sm:text-xs uppercase tracking-[0.35em] text-gold/80 font-medium mb-4">
+              <Sparkles className="w-3.5 h-3.5 text-gold/60" />
+              Gatherings
+            </span>
+            <h1 className="font-heading text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight leading-[1.05]">
+              Events
             </h1>
-            <p className="text-white/70 text-xl max-w-3xl mx-auto leading-relaxed">
-              Experience divine encounters and powerful worship services that will transform your life
+            <p className="mt-4 max-w-xl text-white/45 text-sm sm:text-base leading-relaxed">
+              Mark your calendar — moments that shape faith, family, and the nations.
             </p>
           </motion.div>
+        </div>
+      </section>
 
-          {/* Events */}
-          <div className="mb-16">
-            <div className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto">
-              {events.map((event, index) => (
-                <motion.div
-                  key={event.title}
-                  initial={{ opacity: 0, y: 50 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.6, delay: index * 0.1 }}
-                  whileHover={{ 
-                    scale: 1.03, 
-                    boxShadow: "0 20px 40px rgba(255, 215, 0, 0.15)" 
-                  }}
-                  className="group relative bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur-xl rounded-3xl border border-gold/20 hover:border-gold/40 transition-all duration-500 overflow-hidden"
-                >
-                  <div className="p-8">
-                    <h3 className="font-heading text-2xl font-bold text-white mb-4 group-hover:text-gold transition-colors">
-                      {event.title}
-                    </h3>
-                    
-                    {event.description && (
-                      <p className="text-white/70 mb-6 leading-relaxed">
-                        {event.description}
-                      </p>
-                    )}
+      {/* Decorative line */}
+      <div className="h-px bg-linear-to-r from-transparent via-gold/25 to-transparent" />
 
-                    <div className="space-y-3 mb-8">
-                      <div className="flex items-center gap-3 text-white/60">
-                        <Calendar className="w-5 h-5 text-gold" />
-                        <span className="text-white/90 font-medium">{event.date}</span>
+      <main className="relative z-10 max-w-6xl mx-auto px-5 sm:px-8 lg:px-12 py-16 sm:py-24">
+        {/* Easter — featured */}
+        {events
+          .filter((e) => e.featured)
+          .map((event, idx) => (
+            <motion.article
+              key={event.id}
+              custom={idx}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, margin: "-80px" }}
+              variants={fadeUp}
+              className="relative mb-16 sm:mb-24 group"
+            >
+              <div className="relative border border-gold/25 bg-gold/10 backdrop-blur-sm overflow-hidden transition-colors duration-300 group-hover:border-gold/35 group-hover:bg-gold/12">
+                <div className="relative p-8 sm:p-10 lg:p-12">
+                  <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-8">
+                    <div className="max-w-2xl">
+                      <span className="text-[11px] uppercase tracking-[0.28em] text-gold/70 font-medium">
+                        Featured
+                      </span>
+                      <h2 className="mt-3 font-heading text-3xl sm:text-4xl md:text-5xl font-bold text-white">
+                        {event.title}
+                      </h2>
+                      <p className="mt-2 text-gold/80 text-sm sm:text-base font-medium">{event.tagline}</p>
+                      <p className="mt-6 text-white/50 text-sm sm:text-base leading-relaxed">{event.description}</p>
+                    </div>
+                    <div className="shrink-0 lg:text-right">
+                      <div className="inline-flex items-center gap-2 text-gold font-heading text-xl sm:text-2xl font-semibold">
+                        <Calendar className="w-5 h-5 sm:w-6 sm:h-6 opacity-80" />
+                        {event.dateLabel}
                       </div>
-                      <div className="flex items-center gap-3 text-white/60">
-                        <Clock className="w-5 h-5 text-gold" />
-                        <span className="text-white/90 font-medium">{event.time}</span>
-                      </div>
-                      <div className="flex items-center gap-3 text-white/60">
-                        <MapPin className="w-5 h-5 text-gold" />
-                        <span className="text-white/90 font-medium">{event.location}</span>
+                      <div className="mt-3 flex items-start gap-2 text-white/35 text-sm justify-end">
+                        <MapPin className="w-4 h-4 mt-0.5 shrink-0" />
+                        {event.location}
                       </div>
                     </div>
-
-                    <motion.button
-                      whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.95 }}
-                      className="w-full flex items-center justify-center gap-3 px-6 py-4 bg-gradient-to-r from-gold to-gold-light text-background font-bold rounded-xl hover:shadow-lg transition-all duration-300"
-                    >
-                      Join Event
-                      <ExternalLink className="w-5 h-5" />
-                    </motion.button>
                   </div>
-                </motion.div>
-              ))}
-            </div>
-          </div>
 
-          
-          {/* CTA */}
-          <motion.div 
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.4 }}
-            className="text-center mt-20"
-          >
-            <motion.a
-              href="#"
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              className="inline-flex items-center gap-3 px-10 py-5 bg-gradient-to-r from-gold via-gold to-gold-light text-background font-bold text-lg rounded-2xl hover:shadow-2xl transition-all duration-300"
+                  <div className="mt-10 grid sm:grid-cols-3 gap-4">
+                    {event.days.map((d, i) => (
+                      <motion.div
+                        key={d.label}
+                        initial={{ opacity: 0, y: 16 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true }}
+                        transition={{ delay: 0.15 + i * 0.1, duration: 0.5 }}
+                        className="relative p-5 border border-white/6 bg-background/40 hover:border-gold/25 transition-colors duration-300"
+                      >
+                        <p className="font-heading font-semibold text-white">{d.label}</p>
+                        <p className="mt-1 text-xs text-white/40 uppercase tracking-wider">{d.detail}</p>
+                        <div className="absolute bottom-0 left-0 right-0 h-px bg-linear-to-r from-transparent via-gold/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                      </motion.div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </motion.article>
+          ))}
+
+        {/* Passover */}
+        {events
+          .filter((e) => !e.featured)
+          .map((event, idx) => (
+            <motion.article
+              key={event.id}
+              custom={idx + 1}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, margin: "-60px" }}
+              variants={fadeUp}
+              className="relative group transition-transform duration-300 hover:-translate-y-1"
             >
-              View Full Calendar
-              <ExternalLink className="w-5 h-5" />
-            </motion.a>
-          </motion.div>
-        </motion.div>
+              <div className="absolute -inset-px rounded-sm bg-linear-to-br from-white/10 via-transparent to-gold/10 opacity-50 group-hover:opacity-90 transition-opacity duration-500" />
+              <div className="relative border border-white/8 bg-white/2 p-8 sm:p-10 lg:flex lg:items-center lg:justify-between lg:gap-12">
+                <div className="max-w-xl">
+                  <h2 className="font-heading text-2xl sm:text-3xl md:text-4xl font-bold text-white">
+                    {event.title}
+                  </h2>
+                  <p className="mt-2 text-gold/75 text-sm font-medium">{event.tagline}</p>
+                  <p className="mt-5 text-white/50 text-sm sm:text-base leading-relaxed">{event.description}</p>
+                </div>
+                <div className="mt-8 lg:mt-0 lg:text-right shrink-0 space-y-3">
+                  <p className="font-heading text-lg sm:text-xl text-white flex items-center gap-2 lg:justify-end">
+                    <Calendar className="w-5 h-5 text-gold/70" />
+                    {event.dateLabel}
+                  </p>
+                  <p className="text-sm text-white/35 flex items-start gap-2 lg:justify-end">
+                    <MapPin className="w-4 h-4 mt-0.5 shrink-0" />
+                    {event.location}
+                  </p>
+                </div>
+              </div>
+            </motion.article>
+          ))}
+
+        <motion.p
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: true }}
+          transition={{ delay: 0.2, duration: 0.6 }}
+          className="mt-16 sm:mt-20 text-center text-white/25 text-xs uppercase tracking-[0.2em]"
+        >
+          More gatherings announced soon
+        </motion.p>
       </main>
 
       <Footer />
